@@ -1,0 +1,20 @@
+{
+  "name": "ari-js",
+  "version": "0.0.0",
+  "description": "JavaScript client for Asterisk REST Interface.",
+  "main": "lib/client.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Samuel Fortier-Galarneau",
+  "dependencies": {
+    "swagger-client": "^2.0.23",
+    "ws": "^0.4.31"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "devDependencies": {
+    "mocha": "^1.17.1"
+  }
+}
