@@ -16,7 +16,7 @@
     "url": "git://github.com/asterisk/node-ari-client"
   },
   "bugs": {
-    "url": "https://issues.asterisk.org/issues",
+    "url": "https://issues.asterisk.org",
     "email": "asterisk-app-dev@lists.digium.com"
   },
   "license": "Apache-2.0",
