@@ -1,20 +1,45 @@
 {
-  "name": "ari-js",
-  "version": "0.0.0",
+  "name": "ari-client",
+  "version": "0.1.0",
   "description": "JavaScript client for Asterisk REST Interface.",
-  "main": "lib/client.js",
+  "homepage": "https://github.com/asterisk/node-ari-client",
+  "keywords": [
+    "Asterisk",
+    "ARI"
+  ],
+  "main": "./lib/client.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --reporter spec"
   },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/asterisk/node-ari-client"
+  },
+  "bugs": {
+    "url": "https://issues.asterisk.org/issues",
+    "email": "asterisk-app-dev@lists.digium.com"
+  },
+  "license": "Apache-2.0",
   "author": "Samuel Fortier-Galarneau",
   "dependencies": {
-    "swagger-client": "^2.0.23",
-    "ws": "^0.4.31"
+    "swagger-client": "^2.0.26",
+    "ws": "^0.4.31",
+    "underscore": "^1.6.0",
+    "node-uuid": "^1.4.1"
   },
   "engines": {
     "node": ">=0.10.0"
   },
   "devDependencies": {
-    "mocha": "^1.17.1"
+    "mocha": "^1.17.1",
+    "grunt": "^0.4.4",
+    "grunt-mocha-test": "^0.10.0",
+    "grunt-contrib-jshint": "^0.10.0",
+    "mustache": "^0.8.1",
+    "grunt-jsdoc": "^0.5.4",
+    "moment": "^2.6.0",
+    "hock": "^0.2.5",
+    "request": "^2.34.0",
+    "async": "^0.8.0"
   }
 }
