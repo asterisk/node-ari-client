@@ -415,7 +415,7 @@ describe('client', function () {
       done();
     });
 
-    it('should allow passing body parameters for client and resources',
+    it('should allow passing function variables to client or resource',
         function(done) {
 
       var channel = ari.Channel();
@@ -442,6 +442,45 @@ describe('client', function () {
         endpoint: 'SIP/softphone',
         app: 'unittests',
         variables: {'CALLERID(name)': 'Alice'}
+      };
+      ari.channels.originate(options, function(err, channel) {
+        if (!err) {
+          channel.originate(options, function(err, channel) {
+            if (!err) {
+              done();
+            }
+          });
+        }
+      });
+    });
+
+    it('should allow passing standard variables to client or resource',
+        function(done) {
+
+      var channel = ari.Channel();
+      var body = '{"variables":{"CUSTOM":"myvar"}}';
+
+      server
+        .post(
+          '/ari/channels?endpoint=SIP%2Fsoftphone&app=unittests',
+          body
+        )
+        .any()
+        .reply(200, {id: '1'})
+        .post(
+          util.format(
+            '/ari/channels?endpoint=SIP%2Fsoftphone&app=unittests&channelId=%s',
+            channel.id
+          ),
+          body
+        )
+        .any()
+        .reply(200, {id: '1'});
+
+      var options = {
+        endpoint: 'SIP/softphone',
+        app: 'unittests',
+        variables: {'CUSTOM': 'myvar'}
       };
       ari.channels.originate(options, function(err, channel) {
         if (!err) {
