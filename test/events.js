@@ -135,6 +135,127 @@ describe('events', function () {
         }
       });
     });
+
+    it('should allow multiple scoped events', function (done) {
+      var count = 0;
+      var channel1Count = 0;
+      ari.on('ChannelDtmfReceived', function (event, channel) {
+        count += 1;
+
+        if (count === 2 && channel1Count === 2) {
+          done();
+        }
+      });
+
+      var channel1 = ari.Channel();
+      var channel2 = ari.Channel();
+
+      channel1.on('ChannelDtmfReceived', function (event, channel) {
+        channel1Count += 1;
+      });
+
+      channel1.on('ChannelDtmfReceived', function (event, channel) {
+        channel1Count += 1;
+      });
+
+      wsserver.send({
+        type: 'ChannelDtmfReceived',
+        digit: '1',
+        channel: {
+          id: channel1.id
+        }
+      });
+
+      wsserver.send({
+        type: 'ChannelDtmfReceived',
+        digit: '2',
+        channel: {
+          id: channel2.id
+        }
+      });
+    });
+
+    it('should allow removing specific scoped events', function (done) {
+      var count = 0;
+      var channel1Count = 0;
+      ari.on('ChannelDtmfReceived', function (event, channel) {
+        count += 1;
+
+        if (count === 2 && channel1Count === 1) {
+          done();
+        }
+      });
+
+      var channel1 = ari.Channel();
+      var channel2 = ari.Channel();
+
+      channel1.on('ChannelDtmfReceived', function (event, channel) {
+        channel1Count += 1;
+      });
+
+      var callback = function (event, channel) {
+        throw new Error('Should not have received this event');
+      };
+
+      channel2.on('ChannelDtmfReceived', callback);
+      channel2.removeListener('ChannelDtmfReceived', callback);
+
+      wsserver.send({
+        type: 'ChannelDtmfReceived',
+        digit: '1',
+        channel: {
+          id: channel1.id
+        }
+      });
+
+      wsserver.send({
+        type: 'ChannelDtmfReceived',
+        digit: '2',
+        channel: {
+          id: channel2.id
+        }
+      });
+    });
+
+    it('should allow removing all scoped events', function (done) {
+      var count = 0;
+      ari.on('ChannelDtmfReceived', function (event, channel) {
+        count += 1;
+
+        if (count === 2) {
+          done();
+        }
+      });
+
+      var channel1 = ari.Channel();
+
+      channel1.on('ChannelDtmfReceived', function (event, channel) {
+        throw new Error('Should not have received this event');
+      });
+
+      channel1.on('ChannelDtmfReceived', function (event, channel) {
+        throw new Error('Should not have received this event');
+      });
+
+      channel1.removeAllListener('ChannelDtmfReceived');
+
+      wsserver.send({
+        type: 'ChannelDtmfReceived',
+        digit: '1',
+        channel: {
+          id: channel1.id
+        }
+      });
+
+      wsserver.send({
+        type: 'ChannelDtmfReceived',
+        digit: '2',
+        channel: {
+          id: channel1.id
+        }
+      });
+    });
+
   });
 });
 
