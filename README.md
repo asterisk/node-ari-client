@@ -128,7 +128,7 @@ ari.applications.subscribe(
 
 ###### Available Parameters
 - applicationName (string) - Application's name
-- eventSource (string) - URI for event source (channel:{channelId}, bridge:{bridgeId}, endpoint:{tech}/{resource}, deviceState:{deviceName}
+- eventSource (string) - URI for event source (channel:{channelId}, bridge:{bridgeId}, endpoint:{tech}[/{resource}], deviceState:{deviceName}
 
 ##### unsubscribe
 
@@ -144,7 +144,7 @@ ari.applications.unsubscribe(
 
 ###### Available Parameters
 - applicationName (string) - Application's name
-- eventSource (string) - URI for event source (channel:{channelId}, bridge:{bridgeId}, endpoint:{tech}/{resource}, deviceState:{deviceName}
+- eventSource (string) - URI for event source (channel:{channelId}, bridge:{bridgeId}, endpoint:{tech}[/{resource}], deviceState:{deviceName}
 
 #### asterisk
 
@@ -303,6 +303,27 @@ ari.bridges.play(
 - lang (string) - For sounds, selects language for sound.
 - media (string) - Media's URI to play.
 - offsetms (int) - Number of media to skip before playing.
+- playbackId (string) - Playback Id.
+- skipms (int) - Number of milliseconds to skip for forward/reverse operations.
+
+##### playWithId
+
+Start playback of media on a bridge.
+
+```javascript
+ari.bridges.playWithId(
+  {bridgeId: val, media: val, playbackId: val},
+  function (err, playback) {}
+);
+```
+
+
+###### Available Parameters
+- bridgeId (string) - Bridge's id
+- lang (string) - For sounds, selects language for sound.
+- media (string) - Media's URI to play.
+- offsetms (int) - Number of media to skip before playing.
+- playbackId (string) - Playback ID.
 - skipms (int) - Number of milliseconds to skip for forward/reverse operations.
 
 ##### record
@@ -521,7 +542,7 @@ ari.channels.originate(
 - otherChannelId (string) - The unique id to assign the second channel when using local channels.
 - priority (long) - The priority to dial after the endpoint answers. If omitted, uses 1
 - timeout (int) - Timeout (in seconds) before giving up dialing, or -1 for no timeout.
-- variables (containers) - The 'variables' key in the body object holds variable key/value pairs to set on the channel on creation. Other keys in the body object are interpreted as query parameters. Ex. { 'endpoint': 'SIP/Alice', 'variables': { 'CALLERID(name)': 'Alice' } }
+- variables (containers) - The "variables" key in the body object holds variable key/value pairs to set on the channel on creation. Other keys in the body object are interpreted as query parameters. Ex. { "endpoint": "SIP/Alice", "variables": { "CALLERID(name)": "Alice" } }
 
 ##### originateWithId
 
@@ -546,7 +567,7 @@ ari.channels.originateWithId(
 - otherChannelId (string) - The unique id to assign the second channel when using local channels.
 - priority (long) - The priority to dial after the endpoint answers. If omitted, uses 1
 - timeout (int) - Timeout (in seconds) before giving up dialing, or -1 for no timeout.
-- variables (containers) - The 'variables' key in the body object holds variable key/value pairs to set on the channel on creation. Other keys in the body object are interpreted as query parameters. Ex. { 'endpoint': 'SIP/Alice', 'variables': { 'CALLERID(name)': 'Alice' } }
+- variables (containers) - The "variables" key in the body object holds variable key/value pairs to set on the channel on creation. Other keys in the body object are interpreted as query parameters. Ex. { "endpoint": "SIP/Alice", "variables": { "CALLERID(name)": "Alice" } }
 
 ##### play
 
@@ -910,6 +931,43 @@ ari.endpoints.listByTech(
 ###### Available Parameters
 - tech (string) - Technology of the endpoints (sip,iax2,...)
 
+##### sendMessage
+
+Send a message to some technology URI or endpoint.
+
+```javascript
+ari.endpoints.sendMessage(
+  {from: val, to: val},
+  function (err) {}
+);
+```
+
+
+###### Available Parameters
+- body (string) - The body of the message
+- from (string) - The endpoint resource or technology specific identity to send this message from. Valid resources are sip, pjsip, and xmpp.
+- to (string) - The endpoint resource or technology specific URI to send the message to. Valid resources are sip, pjsip, and xmpp.
+- variables (containers) - undefined
+
+##### sendMessageToEndpoint
+
+Send a message to some endpoint in a technology.
+
+```javascript
+ari.endpoints.sendMessageToEndpoint(
+  {from: val},
+  function (err) {}
+);
+```
+
+
+###### Available Parameters
+- body (string) - The body of the message
+- from (string) - The endpoint resource or technology specific identity to send this message from. Valid resources are sip, pjsip, and xmpp.
+- resource (string) - ID of the endpoint
+- tech (string) - Technology of the endpoint
+- variables (containers) - undefined
+
 #### mailboxes
 
 ##### delete
@@ -1034,6 +1092,22 @@ ari.recordings.cancel(
 
 ###### Available Parameters
 - recordingName (string) - The name of the recording
+
+##### copyStored
+
+Copy a stored recording.
+
+```javascript
+ari.recordings.copyStored(
+  {destinationRecordingName: val, recordingName: val},
+  function (err, storedrecording) {}
+);
+```
+
+
+###### Available Parameters
+- destinationRecordingName (string) - The destination name of the recording
+- recordingName (string) - The name of the recording to copy
 
 ##### deleteStored
 
@@ -1229,7 +1303,7 @@ function (event) {}
 Notification that an attended transfer has occurred.
 
 ```javascript
-function (event, {destination_link_first_leg: val, destination_link_second_leg: val, destination_threeway_bridge: val, destination_threeway_channel: val, transferer_first_leg: val, transferer_first_leg_bridge: val, transferer_second_leg: val, transferer_second_leg_bridge: val}) {}
+function (event, {destination_link_first_leg: val, destination_link_second_leg: val, destination_threeway_bridge: val, destination_threeway_channel: val, replace_channel: val, transfer_target: val, transferee: val, transferer_first_leg: val, transferer_first_leg_bridge: val, transferer_second_leg: val, transferer_second_leg_bridge: val}) {}
 ```
 
 
@@ -1242,7 +1316,10 @@ function (event, {destination_link_first_leg: val, destination_link_second_leg: 
 - destination_threeway_channel (Channel) - Transferer channel that survived the threeway result
 - destination_type (string) - How the transfer was accomplished
 - is_external (boolean) - Whether the transfer was externally initiated or not
+- replace_channel (Channel) - The channel that is replacing transferer_first_leg in the swap
 - result (string) - The result of the transfer attempt
+- transfer_target (Channel) - The channel that is being transferred to
+- transferee (Channel) - The channel that is being transferred
 - transferer_first_leg (Channel) - First leg of the transferer
 - transferer_first_leg_bridge (Bridge) - Bridge the transferer first leg is in
 - transferer_second_leg (Channel) - Second leg of the transferer
@@ -1257,7 +1334,7 @@ Bridge
 Notification that a blind transfer has occurred.
 
 ```javascript
-function (event, {bridge: val, channel: val}) {}
+function (event, {bridge: val, channel: val, replace_channel: val, transferee: val}) {}
 ```
 
 
@@ -1267,7 +1344,9 @@ function (event, {bridge: val, channel: val}) {}
 - context (string) - The context transferred to
 - exten (string) - The extension transferred to
 - is_external (boolean) - Whether the transfer was externally initiated or not
+- replace_channel (Channel) - The channel that is replacing transferer when the transferee(s) can not be transferred directly
 - result (string) - The result of the transfer attempt
+- transferee (Channel) - The channel that is being transferred
 
 ##### Resource Specific Emitters 
 Bridge
@@ -1470,9 +1549,9 @@ function (event, channel) {}
 ##### Resource Specific Emitters 
 Channel
 
-#### ChannelUserevent
+#### ChannelTalkingFinished
 
-User-generated event with additional user-defined fields in the object.
+Talking is no longer detected on the channel.
 
 ```javascript
 function (event, channel) {}
@@ -1480,12 +1559,47 @@ function (event, channel) {}
 
 
 ##### Available Event Properties
-- channel (Channel) - The channel that signaled the user event.
+- channel (Channel) - The channel on which talking completed.
+- duration (int) - The length of time, in milliseconds, that talking was detected on the channel
+
+##### Resource Specific Emitters 
+Channel
+
+#### ChannelTalkingStarted
+
+Talking was detected on the channel.
+
+```javascript
+function (event, channel) {}
+```
+
+
+##### Available Event Properties
+- channel (Channel) - The channel on which talking started.
+
+##### Resource Specific Emitters 
+Channel
+
+#### ChannelUserevent
+
+User-generated event with additional user-defined fields in the object.
+
+```javascript
+function (event, {bridge: val, channel: val, endpoint: val}) {}
+```
+
+
+##### Available Event Properties
+- bridge (Bridge) - A bridge that is signaled with the user event.
+- channel (Channel) - A channel that is signaled with the user event.
+- endpoint (Endpoint) - A endpoint that is signaled with the user event.
 - eventname (string) - The name of the user event.
 - userevent (object) - Custom Userevent data
 
 ##### Resource Specific Emitters 
+Bridge
 Channel
+Endpoint
 
 #### ChannelVarset
 
@@ -1663,16 +1777,33 @@ Channel
 Notification that a channel has entered a Stasis application.
 
 ```javascript
-function (event, channel) {}
+function (event, {channel: val, replace_channel: val}) {}
 ```
 
 
 ##### Available Event Properties
 - args (List[string]) - Arguments to the application
 - channel (Channel) - undefined
+- replace_channel (Channel) - undefined
 
 ##### Resource Specific Emitters 
 Channel
+
+#### TextMessageReceived
+
+A text message was received from an endpoint.
+
+```javascript
+function (event, endpoint) {}
+```
+
+
+##### Available Event Properties
+- endpoint (Endpoint) - undefined
+- message (TextMessage) - undefined
+
+##### Resource Specific Emitters 
+Endpoint
 
 
 
