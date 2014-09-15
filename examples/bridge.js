@@ -84,7 +84,8 @@ client.connect('http://ari.js:8088', 'user', 'secret',
         bridge.create({type: 'holding'},
             /**
              *  Add incoming channel to newly created holding bridge and play
-             *  music on hold.
+             *  music on hold. An event is also registered to cleanup the bridge
+             *  once all channels have left it.
              *
              *  @callback createBridgeCallback
              *  @memberof bridge-example
@@ -94,6 +95,9 @@ client.connect('http://ari.js:8088', 'user', 'secret',
              */  
             function (err, bridge) {
 
+          bridge.on('ChannelLeftBridge', function(event, instances) {
+            cleanupBridge(event, instances, bridge);
+          });
           joinHoldingBridgeAndPlayMoh(bridge, channel);
         });
       } else {
@@ -105,8 +109,27 @@ client.connect('http://ari.js:8088', 'user', 'secret',
   }
 
   /**
-   *  Join holding bridge and play music on hold. An event listener is also
-   *  setup to handle cleaning up the bridge once all channels have left it.
+   *  If no channel remains in the bridge, destroy it.
+   *
+   *  @callback channelLeftBridgeCallback
+   *  @memberof bridge-example
+   *  @param {Object} event - the full event object
+   *  @param {Object} instances - bridge and channel
+   *    instances tied to this channel left bridge event 
+   *  @param {Bridge} bridge - the bridge the event is attached to
+   */
+  function cleanupBridge (event, instances, bridge) {
+
+    var holdingBridge = instances.bridge;
+    if (holdingBridge.channels.length === 0 &&
+        holdingBridge.id === bridge.id) {
+
+      bridge.destroy(function (err) {});
+    }
+  }
+
+  /**
+   *  Join holding bridge and play music on hold.
    *
    *  @function joinHoldingBridgeAndPlayMoh
    *  @memberof bridge-example
@@ -116,25 +139,6 @@ client.connect('http://ari.js:8088', 'user', 'secret',
    *    the channel that entered Stasis
    */
   function joinHoldingBridgeAndPlayMoh (bridge, channel) {
-    bridge.on('ChannelLeftBridge',
-        /**
-         *  If no channel remains in the bridge, destroy it.
-         *
-         *  @callback channelLeftBridgeCallback
-         *  @memberof bridge-example
-         *  @param {Object} event - the full event object
-         *  @param {Object} instances - bridge and channel
-         *    instances tied to this channel left bridge event 
-         */
-        function (event, instances) {
-
-      var holdingBridge = instances.bridge;
-      if (holdingBridge.channels.length === 0 &&
-          holdingBridge.id === bridge.id) {
-
-        bridge.destroy(function (err) {});
-      }
-    });
 
     bridge.addChannel({channel: channel.id}, function (err) {
       channel.startMoh(function (err) {});
