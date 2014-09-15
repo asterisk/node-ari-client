@@ -106,6 +106,7 @@ describe('events', function () {
     it('should have scoped events', function (done) {
       var count = 0;
       var bridge1Count = 0;
+      ari.removeAllListeners('BridgeDestroyed');
       ari.on('BridgeDestroyed', function (event, bridge) {
         count += 1;
 
@@ -139,6 +140,7 @@ describe('events', function () {
     it('should allow multiple scoped events', function (done) {
       var count = 0;
       var channel1Count = 0;
+      ari.removeAllListeners('ChannelDtmfReceived');
       ari.on('ChannelDtmfReceived', function (event, channel) {
         count += 1;
 
@@ -175,9 +177,47 @@ describe('events', function () {
       });
     });
 
+    it('should allow scoped events that fire only once', function (done) {
+      var count = 0;
+      var channel1Count = 0;
+      ari.removeAllListeners('ChannelDtmfReceived');
+      ari.on('ChannelDtmfReceived', function (event, channel) {
+        count += 1;
+
+        if (count === 2 && channel1Count === 1) {
+          done();
+        }
+      });
+
+      var channel1 = ari.Channel();
+
+      channel1.once('ChannelDtmfReceived', function (event, channel) {
+        channel1Count += 1;
+        if (channel1Count > 1) {
+          throw new Error('Should not have received this event');
+        }
+      });
+
+      wsserver.send({
+        type: 'ChannelDtmfReceived',
+        digit: '1',
+        channel: {
+          id: channel1.id
+        }
+      });
+
+      wsserver.send({
+        type: 'ChannelDtmfReceived',
+        digit: '2',
+        channel: {
+          id: channel1.id
+        }
+      });
+    });
     it('should allow removing specific scoped events', function (done) {
       var count = 0;
       var channel1Count = 0;
+      ari.removeAllListeners('ChannelDtmfReceived');
       ari.on('ChannelDtmfReceived', function (event, channel) {
         count += 1;
 
@@ -219,6 +259,7 @@ describe('events', function () {
 
     it('should allow removing all scoped events', function (done) {
       var count = 0;
+      ari.removeAllListeners('ChannelDtmfReceived');
       ari.on('ChannelDtmfReceived', function (event, channel) {
         count += 1;
 
