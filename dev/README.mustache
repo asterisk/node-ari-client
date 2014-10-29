@@ -82,6 +82,17 @@ var playback = ari.Playback();
 channel.play({media: 'sound:hello-world'}, playback, function (err, playback) {});
 ```
 
+If you are using the client directly to call a create operation instead of using an instance, you will have to pass the appropriate ids as part of the options to the create operation.
+
+```javascript
+var playback = ari.Playback();
+ari.channels.play({
+  media: 'sound:hello-world',
+  channelId: channel.id,
+  playbackId: playback.id
+}, function (err, playback) {});
+```
+
 ### Operations
 
 The following operations are defined:
