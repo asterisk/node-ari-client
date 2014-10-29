@@ -278,7 +278,7 @@ describe('events', function () {
         throw new Error('Should not have received this event');
       });
 
-      channel1.removeAllListener('ChannelDtmfReceived');
+      channel1.removeAllListeners('ChannelDtmfReceived');
 
       wsserver.send({
         type: 'ChannelDtmfReceived',
