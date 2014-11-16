@@ -1899,6 +1899,14 @@ grunt
 
 jshint will enforce a minimal style guide. It is also a good idea to create unit tests when adding new features to ari-client.
 
+To generate a test coverage report run the following:
+
+```bash
+$ grunt coverage
+```
+
+This will also ensure a coverage threshold is met by the tests.
+
 Unit test fixtures for ARI resources can be generated from a local asterisk instance by running the following:
 
 ```bash

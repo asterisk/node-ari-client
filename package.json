@@ -31,15 +31,17 @@
     "node": ">=0.10.0"
   },
   "devDependencies": {
-    "mocha": "^1.17.1",
+    "async": "^0.8.0",
     "grunt": "^0.4.4",
-    "grunt-mocha-test": "^0.10.0",
     "grunt-contrib-jshint": "^0.10.0",
-    "mustache": "^0.8.1",
     "grunt-jsdoc": "^0.5.4",
-    "moment": "^2.6.0",
+    "grunt-mocha-istanbul": "^2.2.0",
+    "grunt-mocha-test": "^0.10.0",
     "hock": "^0.2.5",
-    "request": "^2.34.0",
-    "async": "^0.8.0"
+    "istanbul": "^0.3.2",
+    "mocha": "^1.17.1",
+    "moment": "^2.6.0",
+    "mustache": "^0.8.1",
+    "request": "^2.34.0"
   }
 }
