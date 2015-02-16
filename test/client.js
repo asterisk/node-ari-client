@@ -148,6 +148,15 @@ describe('client', function () {
     client.connect(url, user, pass, done);
   });
 
+  it('should send an error if host is not reachable', function(done) {
+    url = 'http://notthere:8088';
+    client.connect(url, user, pass, function(err, newClient) {
+      if (err && err.name === 'HostIsNotReachable') {
+        done();
+      }
+    });
+  });
+
   it('should have all resources', function (done) {
     var candidates = _.keys(ari);
     var expected = [
@@ -191,7 +200,7 @@ describe('client', function () {
     _.each(operations, function (value, key) {
       it(util.format('%s should have all operations', key), function (done) {
         var candidates = _.keys(ari[key]);
-        var expected = value; 
+        var expected = value;
 
         _.each(expected, function (resource) {
           assert(_.contains(candidates, resource));
@@ -232,7 +241,7 @@ describe('client', function () {
       ari.bridges.get({bridgeId: '1'}, function (err, bridge) {
         assert(bridge === undefined);
         assert(err.message.match('Bridge not found'));
-        
+
         done();
       });
     });
@@ -495,4 +504,3 @@ describe('client', function () {
 
   });
 });
-
