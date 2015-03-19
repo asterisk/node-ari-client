@@ -27,7 +27,7 @@ var helpers = require('./helpers.js');
 
 describe('events', function () {
 
-  var url = 'http://localhost:8088';
+  var url = 'http://localhost:%s';
   var user = 'user';
   var pass = 'secret';
   var ari = null;
@@ -35,8 +35,9 @@ describe('events', function () {
   var wsserver = null;
 
   before(function (done) {
-    helpers.mockClient(function (err, hockServer) {
+    helpers.mockClient(function (err, hockServer, port) {
       server = hockServer;
+      url = util.format(url, port);
       client.connect(url, user, pass, clientLoaded);
 
       function clientLoaded (err, newClient) {
