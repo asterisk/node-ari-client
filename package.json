@@ -22,10 +22,11 @@
   "license": "Apache-2.0",
   "author": "Samuel Fortier-Galarneau",
   "dependencies": {
+    "backoff-func": "^0.1.1",
+    "node-uuid": "^1.4.1",
     "swagger-client": "^2.0.26",
-    "ws": "^0.4.31",
     "underscore": "^1.6.0",
-    "node-uuid": "^1.4.1"
+    "ws": "^0.4.31"
   },
   "engines": {
     "node": ">=0.10.0"
