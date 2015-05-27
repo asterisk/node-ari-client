@@ -1,7 +1,7 @@
 /**
  *  This example shows how a channel entering a Stasis application can be added
  *  to a holding bridge and music on hold played on that channel.
- *  
+ *
  *  @namespace bridge-example
  *
  *  @copyright 2014, Digium, Inc.
@@ -26,22 +26,22 @@ client.connect('http://ari.js:8088', 'user', 'secret',
      *
      *  @callback connectCallback
      *  @memberof bridge-example
-     *  @param {Error} err - error object if any, null otherwise 
-     *  @param {module:ari-client~Client} ari - ARI client 
-     */  
+     *  @param {Error} err - error object if any, null otherwise
+     *  @param {module:ari-client~Client} ari - ARI client
+     */
     function (err, ari) {
 
-  // use once to start the application 
+  // use once to start the application
   ari.on('StasisStart',
       /**
        *  Answer incoming channel, join holding bridge, then play music on hold.
        *
        *  @callback stasisStartCallback
        *  @memberof bridge-example
-       *  @param {Event} event - full event object 
+       *  @param {Event} event - full event object
        *  @param {module:resources~Channel} channel -
-       *    the channel that entered Stasis 
-       */  
+       *    the channel that entered Stasis
+       */
       function (event, incoming) {
 
     incoming.answer(function (err) {
@@ -72,12 +72,9 @@ client.connect('http://ari.js:8088', 'user', 'secret',
          */
         function (err, bridges) {
 
-      var bridge = null;
-      bridges.forEach(function (candidate) {
-        if (candidate.bridge_type === 'holding') {
-          bridge = candidate;
-        }
-      });
+      var bridge = bridges.filter(function (candidate) {
+        return candidate['bridge_type'] === 'holding';
+      })[0];
 
       if (!bridge) {
         bridge = ari.Bridge();
@@ -88,10 +85,10 @@ client.connect('http://ari.js:8088', 'user', 'secret',
              *
              *  @callback createBridgeCallback
              *  @memberof bridge-example
-             *  @param {Error} err - error object if any, null otherwise 
+             *  @param {Error} err - error object if any, null otherwise
              *  @param {module:resources~Bridge} bridge - The bridge that
-             *    was created 
-             */  
+             *    was created
+             */
             function (err, bridge) {
 
           joinHoldingBridgeAndPlayMoh(bridge, channel);
@@ -124,7 +121,7 @@ client.connect('http://ari.js:8088', 'user', 'secret',
          *  @memberof bridge-example
          *  @param {Object} event - the full event object
          *  @param {Object} instances - bridge and channel
-         *    instances tied to this channel left bridge event 
+         *    instances tied to this channel left bridge event
          */
         function (event, instances) {
 
@@ -141,7 +138,6 @@ client.connect('http://ari.js:8088', 'user', 'secret',
     });
   }
 
-  // can also use ari.start(['app-name'...]) to start multiple applications 
+  // can also use ari.start(['app-name'...]) to start multiple applications
   ari.start('bridge-example');
 });
-

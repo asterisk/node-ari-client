@@ -41,24 +41,18 @@ client.connect('http://ari.js:8088', 'user', 'secret',
   // make extra calls to ARI
   var currentBridgeState = 'NOT_INUSE';
 
-  bridge.create({type: 'mixing'},
-      /**
-       *  Set device state to not in use since this bridge is newly created.
-       *
-       *  @callback bridgeCreateCallback
-       *  @memberof device-state-example
-       *  @param {Error} err - error object if any, null otherwise
-       *  @param {module:resources~Bridge} instance - the created bridge
-       */
-      function (err, instance) {
+  bridge.create({type: 'mixing'})
+    .then(function (instance) {
 
-    // Mark this bridge as available
-    var opts = {
-      deviceName: util.format('Stasis:%s', BRIDGE_STATE),
-      deviceState: 'NOT_INUSE'
-    };
-    ari.deviceStates.update(opts, function (err) {});
-  });
+      // Mark this bridge as available
+      var opts = {
+        deviceName: util.format('Stasis:%s', BRIDGE_STATE),
+        deviceState: 'NOT_INUSE'
+      };
+
+      return ari.deviceStates.update(opts);
+    })
+    .catch(function (err) {});
 
   ari.on('ChannelEnteredBridge',
       /**
@@ -78,7 +72,9 @@ client.connect('http://ari.js:8088', 'user', 'secret',
         deviceName: util.format('Stasis:%s', BRIDGE_STATE),
         deviceState: 'BUSY'
       };
-      ari.deviceStates.update(opts, function (err) {});
+
+      ari.deviceStates.update(opts)
+        .catch(function (err) {});
       currentBridgeState = 'BUSY';
     }
   });
@@ -102,7 +98,9 @@ client.connect('http://ari.js:8088', 'user', 'secret',
         deviceName: util.format('Stasis:%s', BRIDGE_STATE),
         deviceState: 'NOT_INUSE'
       };
-      ari.deviceStates.update(opts, function (err) {});
+
+      ari.deviceStates.update(opts)
+        .catch(function (err) {});
       currentBridgeState = 'NOT_INUSE';
     }
   });
@@ -119,9 +117,11 @@ client.connect('http://ari.js:8088', 'user', 'secret',
        */
       function (event, incoming) {
 
-    incoming.answer(function (err, channel) {
-      bridge.addChannel({channel: incoming.id}, function (err) {});
-    });
+    incoming.answer()
+      .then(function (channel) {
+        return bridge.addChannel({channel: incoming.id});
+      })
+      .catch(function (err) {});
   });
 
   // can also use ari.start(['app-name'...]) to start multiple applications

@@ -30,9 +30,9 @@ client.connect('http://ari.js:8088', 'user', 'secret',
      *
      *  @callback connectCallback
      *  @memberof originate-example
-     *  @param {Error} err - error object if any, null otherwise 
-     *  @param {module:ari-client~Client} ari - ARI client 
-     */  
+     *  @param {Error} err - error object if any, null otherwise
+     *  @param {module:ari-client~Client} ari - ARI client
+     */
     function (err, ari) {
 
   // Use once to start the application to ensure this listener will only run
@@ -56,7 +56,7 @@ client.connect('http://ari.js:8088', 'user', 'secret',
   });
 
   /**
-   *  Originate the outgoing channel 
+   *  Originate the outgoing channel
    *
    *  @function originate
    *  @memberof originate-example
@@ -64,7 +64,7 @@ client.connect('http://ari.js:8088', 'user', 'secret',
    *    will originate the call to the endpoint
    */
   function originate (incoming) {
-    incoming.on('StasisEnd',
+    incoming.once('StasisEnd',
         /**
          *  If the incoming channel ends, hangup the outgoing channel.
          *
@@ -81,7 +81,7 @@ client.connect('http://ari.js:8088', 'user', 'secret',
 
     var outgoing = ari.Channel();
 
-    outgoing.on('ChannelDestroyed',
+    outgoing.once('ChannelDestroyed',
         /**
          *  If the endpoint rejects the call, hangup the incoming channel.
          *
@@ -96,7 +96,7 @@ client.connect('http://ari.js:8088', 'user', 'secret',
       incoming.hangup(function (err) {});
     });
 
-    outgoing.on('StasisStart',
+    outgoing.once('StasisStart',
         /**
          *  When the outgoing channel enters Stasis, create a mixing bridge
          *  and join the channels together.
@@ -111,7 +111,7 @@ client.connect('http://ari.js:8088', 'user', 'secret',
 
       var bridge = ari.Bridge();
 
-      outgoing.on('StasisEnd',
+      outgoing.once('StasisEnd',
           /**
            *  If the outgoing channel ends, clean up the bridge.
            *
@@ -168,7 +168,6 @@ client.connect('http://ari.js:8088', 'user', 'secret',
     );
   }
 
-  // can also use ari.start(['app-name'...]) to start multiple applications 
+  // can also use ari.start(['app-name'...]) to start multiple applications
   ari.start('originate-example');
 });
-

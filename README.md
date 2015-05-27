@@ -17,9 +17,20 @@ $ npm install ari-client
 The client exposes a connect function that can be used to connect to an instance
 of ARI and to configure a client with all available resources and operations.
 
+Callbacks:
+
 ```javascript
 var client = require('ari-client');
 client.connect(url, username, password, function (err, ari) {})
+```
+
+Promises:
+
+```javascript
+var client = require('ari-client');
+client.connect(url, username, password)
+  .then(function (ari) {})
+  .catch(function (err) {});
 ```
 
 Upon connecting, a callback will be called passing a reference to a client with
@@ -31,9 +42,23 @@ ari.bridges, ari.channels, ari.endpoints...
 
 Those properties expose operations that can be performed for that given resource.
 
+Callbacks:
+
 ```javascript
 ari.bridges.list(function (err, bridges) {});
 ari.bridges.get({bridgeId: 'uniqueid'}, function (err, bridge) {});
+```
+
+Promises:
+
+```javascript
+ari.bridges.list()
+  .then(function (bridges) {})
+  .catch(function (err) {});
+
+ari.bridges.get({bridgeId: 'uniqueid'})
+  .then(function (bridge) {})
+  .catch(function (err) {});
 ```
 
 Operations that return a resource or a list of resources expose the same operations tied to that given instance.
@@ -56,14 +81,27 @@ ari.Bridge(), ari.Channel(), ari.Playback(), ari.LiveRecording()
 
 The instance returned by these functions can then be used to call a create operations in ARI.
 
+Callbacks:
+
 ```javascript
 var bridge = ari.Bridge();
 bridge.create(function (err, bridge) {});
 ```
 
+Promises:
+
+```javascript
+var bridge = ari.Bridge();
+bridge.create().
+  .then(function (bridge) {})
+  .catch(function (err) {});
+```
+
 Note that the create operation returns an updated copy of the bridge after creation.
 
 Using this method of resource creation, it is possible to register event listeners for a resource before it is created in ARI.
+
+Callbacks:
 
 ```javascript
 var channel = ari.Channel();
@@ -71,18 +109,42 @@ channel.on('StasisStart', function (event, channel) {});
 channel.on('ChannelDtmfReceived', function (event, channel) {});
 channel.originate(
     {endpoint: 'SIP/1000', app: 'application', appArgs: 'dialed'},
-    function(err, channel) {}
+    function (err, channel) {}
 );
 ```
 
+Promises:
+
+```javascript
+var channel = ari.Channel();
+channel.on('StasisStart', function (event, channel) {});
+channel.on('ChannelDtmfReceived', function (event, channel) {});
+channel.originate({endpoint: 'SIP/1000', app: 'application', appArgs: 'dialed'})
+  .then(function (channel) {})
+  .catch(function (err) {});
+```
+
 Some create operations require an instance be passed in for this to work.
+
+Callbacks:
 
 ```javascript
 var playback = ari.Playback();
 channel.play({media: 'sound:hello-world'}, playback, function (err, playback) {});
 ```
 
+Promises:
+
+```javascript
+var playback = ari.Playback();
+channel.play({media: 'sound:hello-world'}, playback)
+  .then(function (playback) {})
+  .catch(function (err) {});
+```
+
 If you are using the client directly to call a create operation instead of using an instance, you will have to pass the appropriate ids as part of the options to the create operation.
+
+Callbacks:
 
 ```javascript
 var playback = ari.Playback();
@@ -91,6 +153,17 @@ ari.channels.play({
   channelId: channel.id,
   playbackId: playback.id
 }, function (err, playback) {});
+```
+
+Promises:
+
+```javascript
+var playback = ari.Playback();
+ari.channels.play({
+  media: 'sound:hello-world',
+  channelId: channel.id,
+  playbackId: playback.id
+}).then(function (playback) {}).catch(function (err) {});
 ```
 
 ### Operations
@@ -103,11 +176,23 @@ The following operations are defined:
 
 Get details of an application.
 
+Callbacks:
+
 ```javascript
 ari.applications.get(
   {applicationName: val},
   function (err, application) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.applications.get({
+    applicationName: val
+})
+  .then(function (application) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - applicationName (string) - Application's name
@@ -116,20 +201,43 @@ ari.applications.get(
 
 List all applications.
 
+Callbacks:
+
 ```javascript
 ari.applications.list(
   function (err, applications) {}
 );
 ```
+
+Promises:
+
+```javascript
+ari.applications.list()
+  .then(function (applications) {})
+  .catch(function (err) {});
+```
 ##### subscribe
 
 Subscribe an application to a event source.
+
+Callbacks:
 
 ```javascript
 ari.applications.subscribe(
   {applicationName: val, eventSource: val},
   function (err, application) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.applications.subscribe({
+    applicationName: val,
+    eventSource: val
+})
+  .then(function (application) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - applicationName (string) - Application's name
@@ -139,11 +247,24 @@ ari.applications.subscribe(
 
 Unsubscribe an application from an event source.
 
+Callbacks:
+
 ```javascript
 ari.applications.unsubscribe(
   {applicationName: val, eventSource: val},
   function (err, application) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.applications.unsubscribe({
+    applicationName: val,
+    eventSource: val
+})
+  .then(function (application) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - applicationName (string) - Application's name
@@ -155,11 +276,23 @@ ari.applications.unsubscribe(
 
 Get the value of a global variable.
 
+Callbacks:
+
 ```javascript
 ari.asterisk.getGlobalVar(
   {variable: val},
   function (err, variable) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.asterisk.getGlobalVar({
+    variable: val
+})
+  .then(function (variable) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - variable (string) - The variable to get
@@ -168,10 +301,20 @@ ari.asterisk.getGlobalVar(
 
 Gets Asterisk system information.
 
+Callbacks:
+
 ```javascript
 ari.asterisk.getInfo(
   function (err, asteriskinfo) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.asterisk.getInfo()
+  .then(function (asteriskinfo) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - only (string) - Filter information returned
@@ -180,11 +323,23 @@ ari.asterisk.getInfo(
 
 Set the value of a global variable.
 
+Callbacks:
+
 ```javascript
 ari.asterisk.setGlobalVar(
   {variable: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.asterisk.setGlobalVar({
+    variable: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - value (string) - The value to set the variable to
@@ -196,11 +351,24 @@ ari.asterisk.setGlobalVar(
 
 Add a channel to a bridge.
 
+Callbacks:
+
 ```javascript
 ari.bridges.addChannel(
   {bridgeId: val, channel: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.bridges.addChannel({
+    bridgeId: val,
+    channel: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - bridgeId (string) - Bridge's id
@@ -211,10 +379,20 @@ ari.bridges.addChannel(
 
 Create a new bridge.
 
+Callbacks:
+
 ```javascript
 ari.bridges.create(
   function (err, bridge) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.bridges.create()
+  .then(function (bridge) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - bridgeId (string) - Unique ID to give to the bridge being created.
@@ -225,11 +403,23 @@ ari.bridges.create(
 
 Create a new bridge or updates an existing one.
 
+Callbacks:
+
 ```javascript
 ari.bridges.createWithId(
   {bridgeId: val},
   function (err, bridge) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.bridges.createWithId({
+    bridgeId: val
+})
+  .then(function (bridge) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - bridgeId (string) - Unique ID to give to the bridge being created.
@@ -240,11 +430,23 @@ ari.bridges.createWithId(
 
 Shut down a bridge.
 
+Callbacks:
+
 ```javascript
 ari.bridges.destroy(
   {bridgeId: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.bridges.destroy({
+    bridgeId: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - bridgeId (string) - Bridge's id
@@ -253,11 +455,23 @@ ari.bridges.destroy(
 
 Get bridge details.
 
+Callbacks:
+
 ```javascript
 ari.bridges.get(
   {bridgeId: val},
   function (err, bridge) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.bridges.get({
+    bridgeId: val
+})
+  .then(function (bridge) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - bridgeId (string) - Bridge's id
@@ -266,20 +480,43 @@ ari.bridges.get(
 
 List all active bridges in Asterisk.
 
+Callbacks:
+
 ```javascript
 ari.bridges.list(
   function (err, bridges) {}
 );
 ```
+
+Promises:
+
+```javascript
+ari.bridges.list()
+  .then(function (bridges) {})
+  .catch(function (err) {});
+```
 ##### play
 
 Start playback of media on a bridge.
+
+Callbacks:
 
 ```javascript
 ari.bridges.play(
   {bridgeId: val, media: val},
   function (err, playback) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.bridges.play({
+    bridgeId: val,
+    media: val
+})
+  .then(function (playback) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - bridgeId (string) - Bridge's id
@@ -293,11 +530,25 @@ ari.bridges.play(
 
 Start playback of media on a bridge.
 
+Callbacks:
+
 ```javascript
 ari.bridges.playWithId(
   {bridgeId: val, media: val, playbackId: val},
   function (err, playback) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.bridges.playWithId({
+    bridgeId: val,
+    media: val,
+    playbackId: val
+})
+  .then(function (playback) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - bridgeId (string) - Bridge's id
@@ -311,11 +562,25 @@ ari.bridges.playWithId(
 
 Start a recording.
 
+Callbacks:
+
 ```javascript
 ari.bridges.record(
   {bridgeId: val, format: val, name: val},
   function (err, liverecording) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.bridges.record({
+    bridgeId: val,
+    format: val,
+    name: val
+})
+  .then(function (liverecording) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - beep (boolean) - Play beep when recording begins
@@ -331,11 +596,24 @@ ari.bridges.record(
 
 Remove a channel from a bridge.
 
+Callbacks:
+
 ```javascript
 ari.bridges.removeChannel(
   {bridgeId: val, channel: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.bridges.removeChannel({
+    bridgeId: val,
+    channel: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - bridgeId (string) - Bridge's id
@@ -345,11 +623,23 @@ ari.bridges.removeChannel(
 
 Play music on hold to a bridge or change the MOH class that is playing.
 
+Callbacks:
+
 ```javascript
 ari.bridges.startMoh(
   {bridgeId: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.bridges.startMoh({
+    bridgeId: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - bridgeId (string) - Bridge's id
@@ -359,11 +649,23 @@ ari.bridges.startMoh(
 
 Stop playing music on hold to a bridge.
 
+Callbacks:
+
 ```javascript
 ari.bridges.stopMoh(
   {bridgeId: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.bridges.stopMoh({
+    bridgeId: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - bridgeId (string) - Bridge's id
@@ -374,11 +676,23 @@ ari.bridges.stopMoh(
 
 Answer a channel.
 
+Callbacks:
+
 ```javascript
 ari.channels.answer(
   {channelId: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.channels.answer({
+    channelId: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - channelId (string) - Channel's id
@@ -387,11 +701,23 @@ ari.channels.answer(
 
 Exit application; continue execution in the dialplan.
 
+Callbacks:
+
 ```javascript
 ari.channels.continueInDialplan(
   {channelId: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.channels.continueInDialplan({
+    channelId: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - channelId (string) - Channel's id
@@ -404,11 +730,23 @@ ari.channels.continueInDialplan(
 
 Channel details.
 
+Callbacks:
+
 ```javascript
 ari.channels.get(
   {channelId: val},
   function (err, channel) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.channels.get({
+    channelId: val
+})
+  .then(function (channel) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - channelId (string) - Channel's id
@@ -417,11 +755,24 @@ ari.channels.get(
 
 Get the value of a channel variable or function.
 
+Callbacks:
+
 ```javascript
 ari.channels.getChannelVar(
   {channelId: val, variable: val},
   function (err, variable) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.channels.getChannelVar({
+    channelId: val,
+    variable: val
+})
+  .then(function (variable) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - channelId (string) - Channel's id
@@ -431,11 +782,23 @@ ari.channels.getChannelVar(
 
 Delete (i.e. hangup) a channel.
 
+Callbacks:
+
 ```javascript
 ari.channels.hangup(
   {channelId: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.channels.hangup({
+    channelId: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - channelId (string) - Channel's id
@@ -445,11 +808,23 @@ ari.channels.hangup(
 
 Hold a channel.
 
+Callbacks:
+
 ```javascript
 ari.channels.hold(
   {channelId: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.channels.hold({
+    channelId: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - channelId (string) - Channel's id
@@ -458,20 +833,42 @@ ari.channels.hold(
 
 List all active channels in Asterisk.
 
+Callbacks:
+
 ```javascript
 ari.channels.list(
   function (err, channels) {}
 );
 ```
+
+Promises:
+
+```javascript
+ari.channels.list()
+  .then(function (channels) {})
+  .catch(function (err) {});
+```
 ##### mute
 
 Mute a channel.
+
+Callbacks:
 
 ```javascript
 ari.channels.mute(
   {channelId: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.channels.mute({
+    channelId: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - channelId (string) - Channel's id
@@ -481,11 +878,23 @@ ari.channels.mute(
 
 Create a new channel (originate).
 
+Callbacks:
+
 ```javascript
 ari.channels.originate(
   {endpoint: val},
   function (err, channel) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.channels.originate({
+    endpoint: val
+})
+  .then(function (channel) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - app (string) - The application that is subscribed to the originated channel. When the channel is answered, it will be passed to this Stasis application. Mutually exclusive with 'context', 'extension', 'priority', and 'label'.
@@ -506,11 +915,24 @@ ari.channels.originate(
 
 Create a new channel (originate with id).
 
+Callbacks:
+
 ```javascript
 ari.channels.originateWithId(
   {channelId: val, endpoint: val},
   function (err, channel) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.channels.originateWithId({
+    channelId: val,
+    endpoint: val
+})
+  .then(function (channel) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - app (string) - The application that is subscribed to the originated channel. When the channel is answered, it will be passed to this Stasis application. Mutually exclusive with 'context', 'extension', 'priority', and 'label'.
@@ -531,11 +953,24 @@ ari.channels.originateWithId(
 
 Start playback of media.
 
+Callbacks:
+
 ```javascript
 ari.channels.play(
   {channelId: val, media: val},
   function (err, playback) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.channels.play({
+    channelId: val,
+    media: val
+})
+  .then(function (playback) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - channelId (string) - Channel's id
@@ -549,11 +984,25 @@ ari.channels.play(
 
 Start playback of media and specify the playbackId.
 
+Callbacks:
+
 ```javascript
 ari.channels.playWithId(
   {channelId: val, media: val, playbackId: val},
   function (err, playback) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.channels.playWithId({
+    channelId: val,
+    media: val,
+    playbackId: val
+})
+  .then(function (playback) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - channelId (string) - Channel's id
@@ -567,11 +1016,25 @@ ari.channels.playWithId(
 
 Start a recording.
 
+Callbacks:
+
 ```javascript
 ari.channels.record(
   {channelId: val, format: val, name: val},
   function (err, liverecording) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.channels.record({
+    channelId: val,
+    format: val,
+    name: val
+})
+  .then(function (liverecording) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - beep (boolean) - Play beep when recording begins
@@ -587,11 +1050,24 @@ ari.channels.record(
 
 Redirect the channel to a different location.
 
+Callbacks:
+
 ```javascript
 ari.channels.redirect(
   {channelId: val, endpoint: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.channels.redirect({
+    channelId: val,
+    endpoint: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - channelId (string) - Channel's id
@@ -601,11 +1077,23 @@ ari.channels.redirect(
 
 Indicate ringing to a channel.
 
+Callbacks:
+
 ```javascript
 ari.channels.ring(
   {channelId: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.channels.ring({
+    channelId: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - channelId (string) - Channel's id
@@ -614,11 +1102,23 @@ ari.channels.ring(
 
 Stop ringing indication on a channel if locally generated.
 
+Callbacks:
+
 ```javascript
 ari.channels.ringStop(
   {channelId: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.channels.ringStop({
+    channelId: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - channelId (string) - Channel's id
@@ -627,11 +1127,23 @@ ari.channels.ringStop(
 
 Send provided DTMF to a given channel.
 
+Callbacks:
+
 ```javascript
 ari.channels.sendDTMF(
   {channelId: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.channels.sendDTMF({
+    channelId: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - after (int) - Amount of time to wait after DTMF digits (specified in milliseconds) end.
@@ -645,11 +1157,24 @@ ari.channels.sendDTMF(
 
 Set the value of a channel variable or function.
 
+Callbacks:
+
 ```javascript
 ari.channels.setChannelVar(
   {channelId: val, variable: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.channels.setChannelVar({
+    channelId: val,
+    variable: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - channelId (string) - Channel's id
@@ -660,11 +1185,24 @@ ari.channels.setChannelVar(
 
 Start snooping.
 
+Callbacks:
+
 ```javascript
 ari.channels.snoopChannel(
   {app: val, channelId: val},
   function (err, channel) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.channels.snoopChannel({
+    app: val,
+    channelId: val
+})
+  .then(function (channel) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - app (string) - Application the snooping channel is placed into
@@ -678,11 +1216,25 @@ ari.channels.snoopChannel(
 
 Start snooping.
 
+Callbacks:
+
 ```javascript
 ari.channels.snoopChannelWithId(
   {app: val, channelId: val, snoopId: val},
   function (err, channel) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.channels.snoopChannelWithId({
+    app: val,
+    channelId: val,
+    snoopId: val
+})
+  .then(function (channel) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - app (string) - Application the snooping channel is placed into
@@ -696,11 +1248,23 @@ ari.channels.snoopChannelWithId(
 
 Play music on hold to a channel.
 
+Callbacks:
+
 ```javascript
 ari.channels.startMoh(
   {channelId: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.channels.startMoh({
+    channelId: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - channelId (string) - Channel's id
@@ -710,11 +1274,23 @@ ari.channels.startMoh(
 
 Play silence to a channel.
 
+Callbacks:
+
 ```javascript
 ari.channels.startSilence(
   {channelId: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.channels.startSilence({
+    channelId: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - channelId (string) - Channel's id
@@ -723,11 +1299,23 @@ ari.channels.startSilence(
 
 Stop playing music on hold to a channel.
 
+Callbacks:
+
 ```javascript
 ari.channels.stopMoh(
   {channelId: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.channels.stopMoh({
+    channelId: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - channelId (string) - Channel's id
@@ -736,11 +1324,23 @@ ari.channels.stopMoh(
 
 Stop playing silence to a channel.
 
+Callbacks:
+
 ```javascript
 ari.channels.stopSilence(
   {channelId: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.channels.stopSilence({
+    channelId: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - channelId (string) - Channel's id
@@ -749,11 +1349,23 @@ ari.channels.stopSilence(
 
 Remove a channel from hold.
 
+Callbacks:
+
 ```javascript
 ari.channels.unhold(
   {channelId: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.channels.unhold({
+    channelId: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - channelId (string) - Channel's id
@@ -762,11 +1374,23 @@ ari.channels.unhold(
 
 Unmute a channel.
 
+Callbacks:
+
 ```javascript
 ari.channels.unmute(
   {channelId: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.channels.unmute({
+    channelId: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - channelId (string) - Channel's id
@@ -778,11 +1402,23 @@ ari.channels.unmute(
 
 Destroy a device-state controlled by ARI.
 
+Callbacks:
+
 ```javascript
 ari.deviceStates.delete(
   {deviceName: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.deviceStates.delete({
+    deviceName: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - deviceName (string) - Name of the device
@@ -791,11 +1427,23 @@ ari.deviceStates.delete(
 
 Retrieve the current state of a device.
 
+Callbacks:
+
 ```javascript
 ari.deviceStates.get(
   {deviceName: val},
   function (err, devicestate) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.deviceStates.get({
+    deviceName: val
+})
+  .then(function (devicestate) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - deviceName (string) - Name of the device
@@ -804,20 +1452,43 @@ ari.deviceStates.get(
 
 List all ARI controlled device states.
 
+Callbacks:
+
 ```javascript
 ari.deviceStates.list(
   function (err, devicestates) {}
 );
 ```
+
+Promises:
+
+```javascript
+ari.deviceStates.list()
+  .then(function (devicestates) {})
+  .catch(function (err) {});
+```
 ##### update
 
 Change the state of a device controlled by ARI. (Note - implicitly creates the device state).
+
+Callbacks:
 
 ```javascript
 ari.deviceStates.update(
   {deviceName: val, deviceState: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.deviceStates.update({
+    deviceName: val,
+    deviceState: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - deviceName (string) - Name of the device
@@ -829,10 +1500,20 @@ ari.deviceStates.update(
 
 Details for an endpoint.
 
+Callbacks:
+
 ```javascript
 ari.endpoints.get(
   function (err, endpoint) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.endpoints.get()
+  .then(function (endpoint) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - resource (string) - ID of the endpoint
@@ -842,19 +1523,39 @@ ari.endpoints.get(
 
 List all endpoints.
 
+Callbacks:
+
 ```javascript
 ari.endpoints.list(
   function (err, endpoints) {}
 );
 ```
+
+Promises:
+
+```javascript
+ari.endpoints.list()
+  .then(function (endpoints) {})
+  .catch(function (err) {});
+```
 ##### listByTech
 
 List available endoints for a given endpoint technology.
+
+Callbacks:
 
 ```javascript
 ari.endpoints.listByTech(
   function (err, endpoints) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.endpoints.listByTech()
+  .then(function (endpoints) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - tech (string) - Technology of the endpoints (sip,iax2,...)
@@ -863,11 +1564,24 @@ ari.endpoints.listByTech(
 
 Send a message to some technology URI or endpoint.
 
+Callbacks:
+
 ```javascript
 ari.endpoints.sendMessage(
   {from: val, to: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.endpoints.sendMessage({
+    from: val,
+    to: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - body (string) - The body of the message
@@ -879,11 +1593,23 @@ ari.endpoints.sendMessage(
 
 Send a message to some endpoint in a technology.
 
+Callbacks:
+
 ```javascript
 ari.endpoints.sendMessageToEndpoint(
   {from: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.endpoints.sendMessageToEndpoint({
+    from: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - body (string) - The body of the message
@@ -898,11 +1624,23 @@ ari.endpoints.sendMessageToEndpoint(
 
 Destroy a mailbox.
 
+Callbacks:
+
 ```javascript
 ari.mailboxes.delete(
   {mailboxName: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.mailboxes.delete({
+    mailboxName: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - mailboxName (string) - Name of the mailbox
@@ -911,11 +1649,23 @@ ari.mailboxes.delete(
 
 Retrieve the current state of a mailbox.
 
+Callbacks:
+
 ```javascript
 ari.mailboxes.get(
   {mailboxName: val},
   function (err, mailbox) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.mailboxes.get({
+    mailboxName: val
+})
+  .then(function (mailbox) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - mailboxName (string) - Name of the mailbox
@@ -924,20 +1674,44 @@ ari.mailboxes.get(
 
 List all mailboxes.
 
+Callbacks:
+
 ```javascript
 ari.mailboxes.list(
   function (err, mailboxs) {}
 );
 ```
+
+Promises:
+
+```javascript
+ari.mailboxes.list()
+  .then(function (mailboxs) {})
+  .catch(function (err) {});
+```
 ##### update
 
 Change the state of a mailbox. (Note - implicitly creates the mailbox).
+
+Callbacks:
 
 ```javascript
 ari.mailboxes.update(
   {mailboxName: val, newMessages: val, oldMessages: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.mailboxes.update({
+    mailboxName: val,
+    newMessages: val,
+    oldMessages: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - mailboxName (string) - Name of the mailbox
@@ -950,11 +1724,24 @@ ari.mailboxes.update(
 
 Control a playback.
 
+Callbacks:
+
 ```javascript
 ari.playbacks.control(
   {operation: val, playbackId: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.playbacks.control({
+    operation: val,
+    playbackId: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - operation (string) - Operation to perform on the playback.
@@ -964,11 +1751,23 @@ ari.playbacks.control(
 
 Get a playback's details.
 
+Callbacks:
+
 ```javascript
 ari.playbacks.get(
   {playbackId: val},
   function (err, playback) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.playbacks.get({
+    playbackId: val
+})
+  .then(function (playback) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - playbackId (string) - Playback's id
@@ -977,11 +1776,23 @@ ari.playbacks.get(
 
 Stop a playback.
 
+Callbacks:
+
 ```javascript
 ari.playbacks.stop(
   {playbackId: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.playbacks.stop({
+    playbackId: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - playbackId (string) - Playback's id
@@ -992,11 +1803,23 @@ ari.playbacks.stop(
 
 Stop a live recording and discard it.
 
+Callbacks:
+
 ```javascript
 ari.recordings.cancel(
   {recordingName: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.recordings.cancel({
+    recordingName: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - recordingName (string) - The name of the recording
@@ -1005,11 +1828,24 @@ ari.recordings.cancel(
 
 Copy a stored recording.
 
+Callbacks:
+
 ```javascript
 ari.recordings.copyStored(
   {destinationRecordingName: val, recordingName: val},
   function (err, storedrecording) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.recordings.copyStored({
+    destinationRecordingName: val,
+    recordingName: val
+})
+  .then(function (storedrecording) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - destinationRecordingName (string) - The destination name of the recording
@@ -1019,11 +1855,23 @@ ari.recordings.copyStored(
 
 Delete a stored recording.
 
+Callbacks:
+
 ```javascript
 ari.recordings.deleteStored(
   {recordingName: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.recordings.deleteStored({
+    recordingName: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - recordingName (string) - The name of the recording
@@ -1032,11 +1880,23 @@ ari.recordings.deleteStored(
 
 List live recordings.
 
+Callbacks:
+
 ```javascript
 ari.recordings.getLive(
   {recordingName: val},
   function (err, liverecording) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.recordings.getLive({
+    recordingName: val
+})
+  .then(function (liverecording) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - recordingName (string) - The name of the recording
@@ -1045,11 +1905,23 @@ ari.recordings.getLive(
 
 Get a stored recording's details.
 
+Callbacks:
+
 ```javascript
 ari.recordings.getStored(
   {recordingName: val},
   function (err, storedrecording) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.recordings.getStored({
+    recordingName: val
+})
+  .then(function (storedrecording) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - recordingName (string) - The name of the recording
@@ -1058,20 +1930,42 @@ ari.recordings.getStored(
 
 List recordings that are complete.
 
+Callbacks:
+
 ```javascript
 ari.recordings.listStored(
   function (err, storedrecordings) {}
 );
 ```
+
+Promises:
+
+```javascript
+ari.recordings.listStored()
+  .then(function (storedrecordings) {})
+  .catch(function (err) {});
+```
 ##### mute
 
 Mute a live recording.
+
+Callbacks:
 
 ```javascript
 ari.recordings.mute(
   {recordingName: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.recordings.mute({
+    recordingName: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - recordingName (string) - The name of the recording
@@ -1080,11 +1974,23 @@ ari.recordings.mute(
 
 Pause a live recording.
 
+Callbacks:
+
 ```javascript
 ari.recordings.pause(
   {recordingName: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.recordings.pause({
+    recordingName: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - recordingName (string) - The name of the recording
@@ -1093,11 +1999,23 @@ ari.recordings.pause(
 
 Stop a live recording and store it.
 
+Callbacks:
+
 ```javascript
 ari.recordings.stop(
   {recordingName: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.recordings.stop({
+    recordingName: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - recordingName (string) - The name of the recording
@@ -1106,11 +2024,23 @@ ari.recordings.stop(
 
 Unmute a live recording.
 
+Callbacks:
+
 ```javascript
 ari.recordings.unmute(
   {recordingName: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.recordings.unmute({
+    recordingName: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - recordingName (string) - The name of the recording
@@ -1119,11 +2049,23 @@ ari.recordings.unmute(
 
 Unpause a live recording.
 
+Callbacks:
+
 ```javascript
 ari.recordings.unpause(
   {recordingName: val},
   function (err) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.recordings.unpause({
+    recordingName: val
+})
+  .then(function () {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - recordingName (string) - The name of the recording
@@ -1134,11 +2076,23 @@ ari.recordings.unpause(
 
 Get a sound's details.
 
+Callbacks:
+
 ```javascript
 ari.sounds.get(
   {soundId: val},
   function (err, sound) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.sounds.get({
+    soundId: val
+})
+  .then(function (sound) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - soundId (string) - Sound's id
@@ -1147,10 +2101,20 @@ ari.sounds.get(
 
 List all sounds.
 
+Callbacks:
+
 ```javascript
 ari.sounds.list(
   function (err, sounds) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.sounds.list()
+  .then(function (sounds) {})
+  .catch(function (err) {});
 ```
 ###### Available Parameters
 - format (string) - Lookup sound in a specific format.
@@ -1205,7 +2169,7 @@ function (event, {destination_link_first_leg: val, destination_link_second_leg: 
 - transferer_second_leg (Channel) - Second leg of the transferer
 - transferer_second_leg_bridge (Bridge) - Bridge the transferer second leg is in
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Channel
 Bridge
 
@@ -1226,7 +2190,7 @@ function (event, {bridge: val, channel: val, replace_channel: val, transferee: v
 - result (string) - The result of the transfer attempt
 - transferee (Channel) - The channel that is being transferred
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Bridge
 Channel
 
@@ -1240,7 +2204,7 @@ function (event, bridge) {}
 ##### Available Event Properties
 - bridge (Bridge) - undefined
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Bridge
 
 #### BridgeDestroyed
@@ -1253,7 +2217,7 @@ function (event, bridge) {}
 ##### Available Event Properties
 - bridge (Bridge) - undefined
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Bridge
 
 #### BridgeMerged
@@ -1267,7 +2231,7 @@ function (event, {bridge: val, bridge_from: val}) {}
 - bridge (Bridge) - undefined
 - bridge_from (Bridge) - undefined
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Bridge
 
 #### ChannelCallerId
@@ -1282,7 +2246,7 @@ function (event, channel) {}
 - caller_presentation_txt (string) - The text representation of the Caller Presentation value.
 - channel (Channel) - The channel that changed Caller ID.
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Channel
 
 #### ChannelConnectedLine
@@ -1295,7 +2259,7 @@ function (event, channel) {}
 ##### Available Event Properties
 - channel (Channel) - The channel whose connected line has changed.
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Channel
 
 #### ChannelCreated
@@ -1308,7 +2272,7 @@ function (event, channel) {}
 ##### Available Event Properties
 - channel (Channel) - undefined
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Channel
 
 #### ChannelDestroyed
@@ -1323,7 +2287,7 @@ function (event, channel) {}
 - cause_txt (string) - Text representation of the cause of the hangup
 - channel (Channel) - undefined
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Channel
 
 #### ChannelDialplan
@@ -1338,7 +2302,7 @@ function (event, channel) {}
 - dialplan_app (string) - The application about to be executed.
 - dialplan_app_data (string) - The data to be passed to the application.
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Channel
 
 #### ChannelDtmfReceived
@@ -1355,7 +2319,7 @@ function (event, channel) {}
 - digit (string) - DTMF digit received (0-9, A-E, # or *)
 - duration_ms (int) - Number of milliseconds DTMF was received
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Channel
 
 #### ChannelEnteredBridge
@@ -1369,7 +2333,7 @@ function (event, {bridge: val, channel: val}) {}
 - bridge (Bridge) - undefined
 - channel (Channel) - undefined
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Bridge
 Channel
 
@@ -1385,7 +2349,7 @@ function (event, channel) {}
 - channel (Channel) - The channel on which the hangup was requested.
 - soft (boolean) - Whether the hangup request was a soft hangup request.
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Channel
 
 #### ChannelHold
@@ -1399,7 +2363,7 @@ function (event, channel) {}
 - channel (Channel) - The channel that initiated the hold event.
 - musicclass (string) - The music on hold class that the initiator requested.
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Channel
 
 #### ChannelLeftBridge
@@ -1413,7 +2377,7 @@ function (event, {bridge: val, channel: val}) {}
 - bridge (Bridge) - undefined
 - channel (Channel) - undefined
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Bridge
 Channel
 
@@ -1427,7 +2391,7 @@ function (event, channel) {}
 ##### Available Event Properties
 - channel (Channel) - undefined
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Channel
 
 #### ChannelTalkingFinished
@@ -1441,7 +2405,7 @@ function (event, channel) {}
 - channel (Channel) - The channel on which talking completed.
 - duration (int) - The length of time, in milliseconds, that talking was detected on the channel
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Channel
 
 #### ChannelTalkingStarted
@@ -1454,7 +2418,7 @@ function (event, channel) {}
 ##### Available Event Properties
 - channel (Channel) - The channel on which talking started.
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Channel
 
 #### ChannelUnhold
@@ -1467,7 +2431,7 @@ function (event, channel) {}
 ##### Available Event Properties
 - channel (Channel) - The channel that initiated the unhold event.
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Channel
 
 #### ChannelUserevent
@@ -1484,7 +2448,7 @@ function (event, {bridge: val, channel: val, endpoint: val}) {}
 - eventname (string) - The name of the user event.
 - userevent (object) - Custom Userevent data
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Bridge
 Channel
 Endpoint
@@ -1503,7 +2467,7 @@ If missing, the variable is a global variable.
 - value (string) - The new value of the variable.
 - variable (string) - The variable that changed.
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Channel
 
 #### DeviceStateChanged
@@ -1516,7 +2480,7 @@ function (event, device_state) {}
 ##### Available Event Properties
 - device_state (DeviceState) - Device state object
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 DeviceState
 
 #### Dial
@@ -1534,7 +2498,7 @@ function (event, {caller: val, forwarded: val, peer: val}) {}
 - forwarded (Channel) - Channel that the caller has been forwarded to.
 - peer (Channel) - The dialed channel.
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Channel
 
 #### EndpointStateChange
@@ -1547,7 +2511,7 @@ function (event, endpoint) {}
 ##### Available Event Properties
 - endpoint (Endpoint) - undefined
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Endpoint
 
 #### MissingParams
@@ -1570,7 +2534,7 @@ function (event, playback) {}
 ##### Available Event Properties
 - playback (Playback) - Playback control object
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Playback
 
 #### PlaybackStarted
@@ -1583,7 +2547,7 @@ function (event, playback) {}
 ##### Available Event Properties
 - playback (Playback) - Playback control object
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Playback
 
 #### RecordingFailed
@@ -1596,7 +2560,7 @@ function (event, recording) {}
 ##### Available Event Properties
 - recording (LiveRecording) - Recording control object
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 LiveRecording
 
 #### RecordingFinished
@@ -1609,7 +2573,7 @@ function (event, recording) {}
 ##### Available Event Properties
 - recording (LiveRecording) - Recording control object
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 LiveRecording
 
 #### RecordingStarted
@@ -1622,7 +2586,7 @@ function (event, recording) {}
 ##### Available Event Properties
 - recording (LiveRecording) - Recording control object
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 LiveRecording
 
 #### StasisEnd
@@ -1635,7 +2599,7 @@ function (event, channel) {}
 ##### Available Event Properties
 - channel (Channel) - undefined
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Channel
 
 #### StasisStart
@@ -1650,7 +2614,7 @@ function (event, {channel: val, replace_channel: val}) {}
 - channel (Channel) - undefined
 - replace_channel (Channel) - undefined
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Channel
 
 #### TextMessageReceived
@@ -1664,7 +2628,7 @@ function (event, endpoint) {}
 - endpoint (Endpoint) - undefined
 - message (TextMessage) - undefined
 
-##### Resource Specific Emitters 
+##### Resource Specific Emitters
 Endpoint
 
 
@@ -1672,6 +2636,8 @@ Endpoint
 # Examples
 
 Replace ari.js with your Asterisk instance.
+
+Callbacks:
 
 ```javascript
 var client = require('ari-client'),
@@ -1681,46 +2647,115 @@ client.connect('http://ari.js:8088', 'user', 'secret', client_loaded);
 
 function client_loaded (err, ari) {
 
-    ari.once('StasisStart', channel_joined);
+  if (err) {
+    throw err; // program will crash if it fails to connect
+  }
 
-    function channel_joined (event, incoming) {
-        incoming.on('ChannelDtmfReceived', dtmf_received);
+  ari.once('StasisStart', channel_joined);
 
-        incoming.answer(function (err) {
-            play(incoming, 'sound:hello-world');
+  function channel_joined (event, incoming) {
+    incoming.on('ChannelDtmfReceived', dtmf_received);
+
+    incoming.answer(function (err) {
+      play(incoming, 'sound:hello-world');
+    });
+  }
+
+  function dtmf_received (event, channel) {
+    var digit = event.digit;
+    switch (digit) {
+      case '#':
+        play(channel, 'sound:vm-goodbye', function (err) {
+          channel.hangup(function (err) {
+            process.exit(0);
+          });
         });
+        break;
+      case '*':
+        play(channel, 'sound:tt-monkeys');
+        break;
+      default:
+        play(channel, util.format('sound:digits/%s', digit));
+    }
+  }
+
+  function play (channel, sound, callback) {
+    var playback = ari.Playback();
+
+    playback.on('PlaybackFinished', function (event, playback) {
+      if (callback) {
+        callback(null);
+      }
+    });
+
+    channel.play({media: sound}, playback, function (err, playback) {});
+  }
+
+  ari.start('hello');
+}
+```
+
+Promises:
+
+```javascript
+var client = require('ari-client'),
+    Q = require('q'),
+    util = require('util');
+
+client.connect('http://ari.js:8088', 'user', 'secret')
+  .then(function (ari) {
+
+    ari.once('StasisStart', channelJoined);
+
+    function channelJoined (event, incoming) {
+      incoming.on('ChannelDtmfReceived', dtmfReceived);
+
+      incoming.answer()
+        .then(function () {
+          return play(incoming, 'sound:hello-world');
+        })
+        .catch(function (err) {});
     }
 
-    function dtmf_received (event, channel) {
-        var digit = event.digit;
-        switch (digit) {
-            case '#':
-                play(channel, 'sound:vm-goodbye', function (err) {
-                    channel.hangup(function (err) {
-                        process.exit(0);
-                    });
-                });
-                break;
-            case '*':
-                play(channel, 'sound:tt-monkeys');
-                break;
-            default:
-                play(channel, util.format('sound:digits/%s', digit));
-        }
+    function dtmfReceived (event, channel) {
+      var digit = event.digit;
+      switch (digit) {
+        case '#':
+          play(channel, 'sound:vm-goodbye')
+            .then(function () {
+              return channel.hangup();
+            })
+            .finally(function () {
+              process.exit(0);
+            });
+          break;
+        case '*':
+          play(channel, 'sound:tt-monkeys');
+          break;
+        default:
+          play(channel, util.format('sound:digits/%s', digit));
+      }
     }
 
-    function play (channel, sound, callback) {
-        var playback = ari.Playback();
-        playback.on('PlaybackFinished', function (event, playback) {
-            if (callback) {
-                callback(null);
-            }
+    function play (channel, sound) {
+      var deferred = Q.defer();
+      var playback = ari.Playback();
+
+      playback.on('PlaybackFinished', function (event, playback) {
+        deferred.resolve(playback);
+      });
+
+      channel.play({media: sound}, playback)
+        .catch(function (err) {
+          deferred.reject(err);
         });
-        channel.play({media: sound}, playback, function (err, playback) { });
+
+      return deferred.promise;
     }
 
     ari.start('hello');
-}
+  })
+  .done(); // program will crash if it fails to connect
 ```
 
 # Testing

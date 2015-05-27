@@ -2,8 +2,18 @@
 
 {{{desc}}}
 
+Callbacks:
+
 ```javascript
 ari.{{{resource}}}.{{{name}}}(
   {{{params}}}function (err{{{results}}}) {}
 );
+```
+
+Promises:
+
+```javascript
+ari.{{{resource}}}.{{{name}}}({{{paramsPromises}}})
+  .then(function ({{{resultsPromises}}}) {})
+  .catch(function (err) {});
 ```
