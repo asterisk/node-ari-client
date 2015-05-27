@@ -22,7 +22,6 @@ var client = require('../lib/client.js');
 var _ = require('underscore');
 var util = require('util');
 var assert = require('assert');
-var hock = require('hock');
 var helpers = require('./helpers.js');
 
 describe('events', function () {

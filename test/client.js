@@ -16,11 +16,13 @@
 /*global require:false*/
 /*jshint globalstrict: true*/
 
-var client = require('../lib/client.js');
-var _ = require('underscore');
 var util = require('util');
 var assert = require('assert');
-var hock = require('hock');
+
+var _ = require('underscore');
+var Promise = require('bluebird');
+
+var client = require('../lib/client.js');
 var helpers = require('./helpers.js');
 
 var operations = {
@@ -46,6 +48,7 @@ var operations = {
     'startMoh',
     'stopMoh',
     'play',
+    'playWithId',
     'record'
   ],
   channels: [
@@ -145,8 +148,16 @@ describe('client', function () {
     server.close(done);
   });
 
-  it('should load without error', function (done) {
+  it('should connect', function (done) {
     client.connect(url, user, pass, done);
+  });
+
+  it('should connect using promises', function (done) {
+    client.connect(url, user, pass).then(function (client) {
+      if (client) {
+        done();
+      }
+    }).done();
   });
 
   it('should have all resources', function (done) {
@@ -203,24 +214,78 @@ describe('client', function () {
       });
     });
 
-    it('should pass resource instance when appropriate', function (done) {
-      var bridge = ari.Bridge();
+    it('should support promises', function (done) {
+      var bridge = ari.Bridge('promises');
 
       server
         .post(util.format('/ari/bridges?type=holding&bridgeId=%s', bridge.id))
         .any()
         .reply(200, {'bridge_type': 'holding', id: bridge.id});
 
-      bridge.create({type: 'holding'}, function (err, instance) {
+      ari.bridges.create({
+        bridgeId: bridge.id,
+        type: 'holding'
+      }).then(function (instance) {
+        validate(instance);
+
+        return instance.create({
+          bridgeId: instance.id,
+          type: 'holding'
+        });
+      }).then(function (instance) {
+        validate(instance);
+
+        done();
+      })
+      .done();
+
+      function validate(instance) {
         assert(_.isObject(instance));
         assert.equal(instance.id, bridge.id);
 
         _.each(operations.bridges, function (operation) {
           assert(_.contains(_.keys(bridge), operation));
         });
+      }
+    });
+
+    it('should work with promisify', function (done) {
+      var bridge = ari.Bridge('denodeify');
+
+      server
+        .post(util.format('/ari/bridges?type=holding&bridgeId=%s', bridge.id))
+        .any()
+        .reply(200, {'bridge_type': 'holding', id: bridge.id});
+
+      var create = Promise.promisify(ari.bridges.create, ari);
+
+      create({
+        bridgeId: bridge.id,
+        type: 'holding'
+      }).then(function (instance) {
+        validate(instance);
+
+        create = Promise.promisify(instance.create, instance);
+
+        return create({
+          bridgeId: instance.id,
+          type: 'holding'
+        });
+      }).then(function (instance) {
+        validate(instance);
 
         done();
-      });
+      })
+      .done();
+
+      function validate(instance) {
+        assert(_.isObject(instance));
+        assert.equal(instance.id, bridge.id);
+
+        _.each(operations.bridges, function (operation) {
+          assert(_.contains(_.keys(bridge), operation));
+        });
+      }
     });
 
     it('should not find resources that do not exist', function (done) {
@@ -236,6 +301,22 @@ describe('client', function () {
 
         done();
       });
+    });
+
+    it('should not find resources that do not exist using promises',
+       function (done) {
+
+      server
+        .get('/ari/bridges/1')
+        .any()
+        .reply(404, {'message': 'Bridge not found'});
+
+      ari.bridges.get({bridgeId: '1'}).catch(function (err) {
+        assert(err.message.match('Bridge not found'));
+
+        done();
+      })
+      .done();
     });
 
     it('should deal with a bad parameter', function (done) {
@@ -265,6 +346,35 @@ describe('client', function () {
       });
     });
 
+    it('should deal with a bad parameter using promises', function (done) {
+
+      server
+        .post('/ari/bridges?type=holding')
+        .any()
+        .reply(200, {'bridge_type': 'holding', id: '123443555.1'})
+        .get('/ari/bridges')
+        .any()
+        .reply(200, [{'bridge_type': 'holding', id: '123443555.1'}])
+        .get('/ari/bridges/123443555.1')
+        .any()
+        .reply(200, {'bridge_type': 'holding', id: '123443555.1'});
+
+      ari.bridges.create({type: 'holding'}).then(function (instance) {
+        return ari.bridges.list();
+      })
+      .then(function (bridges) {
+        return ari.bridges.get({
+          bogus: '',
+          bridgeId: bridges[0].id
+        }).then(function (bridge) {
+          assert.equal(bridges[0].id, bridge.id);
+
+          done();
+        });
+      })
+      .done();
+    });
+
     it('should pass ids to operations when appropriate', function (done) {
 
       var bridge = ari.Bridge();
@@ -276,13 +386,42 @@ describe('client', function () {
         .any()
         .reply(200, {'bridge_type': 'holding', id: bridge.id});
 
-      ari.bridges.create({type: 'holding'}, function (err, bridge) {
+      ari.bridges.create({
+        bridgeId: bridge.id,
+        type: 'holding'
+      }, function (err, bridge) {
         bridge.get(function (err, instance) {
           assert.equal(instance.id, bridge.id);
 
           done();
         });
       });
+    });
+
+    it('should pass ids to operations when appropriate using promises',
+     function (done) {
+
+      var bridge = ari.Bridge();
+      server
+        .post(util.format('/ari/bridges?type=holding&bridgeId=%s', bridge.id))
+        .any()
+        .reply(200, {'bridge_type': 'holding', id: bridge.id})
+        .get(util.format('/ari/bridges/%s', bridge.id))
+        .any()
+        .reply(200, {'bridge_type': 'holding', id: bridge.id});
+
+      ari.bridges.create({
+        bridgeId: bridge.id,
+        type: 'holding'
+      }).then(function (bridge) {
+        return bridge.get();
+      })
+      .then(function (instance) {
+        assert.equal(instance.id, bridge.id);
+
+        done();
+      })
+      .done();
     });
   });
 
@@ -326,6 +465,24 @@ describe('client', function () {
       });
     });
 
+    it('should pass unique id when calling a create method using promises',
+       function (done) {
+
+      var bridge = ari.Bridge();
+
+      server
+        .post(util.format('/ari/bridges?type=holding&bridgeId=%s', bridge.id))
+        .any()
+        .reply(200, {'bridge_type': 'holding', id: bridge.id});
+
+      bridge.create({type: 'holding'}).then(function (instance) {
+        assert.equal(instance.id, bridge.id);
+
+        done();
+      })
+      .done();
+    });
+
     it('should pass instance id when calling a create method', function (done) {
       var bridge = ari.Bridge();
       var recording = ari.LiveRecording();
@@ -353,6 +510,39 @@ describe('client', function () {
           done();
         });
       });
+    });
+
+    it('should pass instance id when calling a create method using promises',
+       function (done) {
+
+      var bridge = ari.Bridge();
+      var recording = ari.LiveRecording();
+
+      server
+        .post(util.format('/ari/bridges?type=holding&bridgeId=%s', bridge.id))
+        .any()
+        .reply(200, {'bridge_type': 'holding', id: bridge.id})
+        .post(
+          util.format(
+            '/ari/bridges/%s/record?name=%s&format=wav&maxDurationSeconds=1',
+            bridge.id,
+            recording.name
+          )
+        )
+        .any()
+        .reply(200, {format: 'wav', name: recording.name});
+
+      bridge.create({type: 'holding'}).then(function (bridgeInstance) {
+        var opts = {format: 'wav', maxDurationSeconds: '1'};
+
+        return bridge.record(opts, recording);
+      }).then(function (instance) {
+        assert(instance.name);
+        assert.equal(instance.name, recording.name);
+
+        done();
+      })
+      .done();
     });
 
     it('should not modify options passed in to operations', function (done) {
@@ -388,6 +578,42 @@ describe('client', function () {
       });
     });
 
+    it('should not modify options passed in to operations using promises',
+       function (done) {
+
+      var bridge = ari.Bridge();
+
+      server
+        .post(util.format('/ari/bridges?type=mixing&bridgeId=%s', bridge.id))
+        .any()
+        .reply(200, {'bridge_type': 'mixing', id: bridge.id})
+        .post(
+          util.format(
+            '/ari/applications/unittests/subscription?eventSource=bridge%3A%s',
+            bridge.id
+          )
+        )
+        .any()
+        .reply(200, {name: 'unittests', 'bridge_ids': [bridge.id]});
+
+      var opts = {
+        applicationName: 'unittests',
+        eventSource: util.format('bridge:%s', bridge.id)
+      };
+
+      bridge.create({type: 'mixing'}).then(function (newBridge) {
+        return ari.applications.subscribe(opts);
+      }).then(function (application) {
+        assert(application);
+        assert.equal(application['bridge_ids'][0], bridge.id);
+        assert.equal(opts.applicationName, 'unittests');
+        assert.equal(opts.eventSource, util.format('bridge:%s', bridge.id));
+
+        done();
+      })
+      .done();
+    });
+
     it('should allow passing in id on creation', function (done) {
       var recording = ari.LiveRecording('mine');
       var channel = ari.Channel('1234');
@@ -417,7 +643,7 @@ describe('client', function () {
     });
 
     it('should allow passing function variables to client or resource',
-        function(done) {
+        function (done) {
 
       var channel = ari.Channel();
       var body = '{"variables":{"CALLERID(name)":"Alice"}}';
@@ -444,9 +670,9 @@ describe('client', function () {
         app: 'unittests',
         variables: {'CALLERID(name)': 'Alice'}
       };
-      ari.channels.originate(options, function(err, channel) {
+      ari.channels.originate(options, function (err, channel) {
         if (!err) {
-          channel.originate(options, function(err, channel) {
+          channel.originate(options, function (err, channel) {
             if (!err) {
               done();
             }
@@ -455,8 +681,46 @@ describe('client', function () {
       });
     });
 
+    it('should allow passing function variables ' +
+       'to client or resource using promises', function (done) {
+
+      var channel = ari.Channel();
+      var body = '{"variables":{"CALLERID(name)":"Bob"}}';
+
+      server
+        .post(
+          '/ari/channels?endpoint=SIP%2Fsoftphone&app=unittests',
+          body
+        )
+        .any()
+        .reply(200, {id: '1'})
+        .post(
+          util.format(
+            '/ari/channels?endpoint=SIP%2Fsoftphone&app=unittests&channelId=%s',
+            channel.id
+          ),
+          body
+        )
+        .any()
+        .reply(200, {id: '1'});
+
+      var options = {
+        endpoint: 'SIP/softphone',
+        app: 'unittests',
+        variables: {'CALLERID(name)': 'Bob'}
+      };
+
+      ari.channels.originate(options).then(function (channel) {
+        return channel.originate(options);
+      })
+      .then(function (channel) {
+        done();
+      })
+      .done();
+    });
+
     it('should allow passing standard variables to client or resource',
-        function(done) {
+        function (done) {
 
       var channel = ari.Channel();
       var body = '{"variables":{"CUSTOM":"myvar"}}';
@@ -483,15 +747,53 @@ describe('client', function () {
         app: 'unittests',
         variables: {'CUSTOM': 'myvar'}
       };
-      ari.channels.originate(options, function(err, channel) {
+      ari.channels.originate(options, function (err, channel) {
         if (!err) {
-          channel.originate(options, function(err, channel) {
+          channel.originate(options, function (err, channel) {
             if (!err) {
               done();
             }
           });
         }
       });
+    });
+
+    it('should allow passing standard variables ' +
+       'to client or resource using promises', function (done) {
+
+      var channel = ari.Channel();
+      var body = '{"variables":{"CUSTOM":"myothervar"}}';
+
+      server
+        .post(
+          '/ari/channels?endpoint=SIP%2Fsoftphone&app=unittests',
+          body
+        )
+        .any()
+        .reply(200, {id: '1'})
+        .post(
+          util.format(
+            '/ari/channels?endpoint=SIP%2Fsoftphone&app=unittests&channelId=%s',
+            channel.id
+          ),
+          body
+        )
+        .any()
+        .reply(200, {id: '1'});
+
+      var options = {
+        endpoint: 'SIP/softphone',
+        app: 'unittests',
+        variables: {'CUSTOM': 'myothervar'}
+      };
+
+      ari.channels.originate(options).then(function (channel) {
+        return channel.originate(options);
+      })
+      .then(function (channel) {
+        done();
+      })
+      .done();
     });
 
   });
