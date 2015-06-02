@@ -38,7 +38,7 @@ var operations = {
   bridges: [
     'list',
     'create',
-    'create_or_update_with_id',
+    'createWithId',
     'get',
     'destroy',
     'addChannel',
@@ -191,7 +191,7 @@ describe('client', function () {
     _.each(operations, function (value, key) {
       it(util.format('%s should have all operations', key), function (done) {
         var candidates = _.keys(ari[key]);
-        var expected = value; 
+        var expected = value;
 
         _.each(expected, function (resource) {
           assert(_.contains(candidates, resource));
@@ -232,7 +232,7 @@ describe('client', function () {
       ari.bridges.get({bridgeId: '1'}, function (err, bridge) {
         assert(bridge === undefined);
         assert(err.message.match('Bridge not found'));
-        
+
         done();
       });
     });
@@ -495,4 +495,3 @@ describe('client', function () {
 
   });
 });
-
