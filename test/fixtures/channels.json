@@ -1,8 +1,8 @@
 {
   "_copyright": "Copyright (C) 2012 - 2013, Digium, Inc.",
   "_author": "David M. Lee, II <dlee@digium.com>",
-  "_svn_revision": "$Revision: 423618 $",
-  "apiVersion": "1.5.0",
+  "_svn_revision": "$Revision$",
+  "apiVersion": "1.7.0",
   "swaggerVersion": "1.1",
   "basePath": "http://localhost:8088/ari",
   "resourcePath": "/api-docs/channels.{format}",
@@ -34,7 +34,7 @@
             },
             {
               "name": "extension",
-              "description": "The extension to dial after the endpoint answers",
+              "description": "The extension to dial after the endpoint answers. Mutually exclusive with 'app'.",
               "paramType": "query",
               "required": false,
               "allowMultiple": false,
@@ -42,7 +42,7 @@
             },
             {
               "name": "context",
-              "description": "The context to dial after the endpoint answers. If omitted, uses 'default'",
+              "description": "The context to dial after the endpoint answers. If omitted, uses 'default'. Mutually exclusive with 'app'.",
               "paramType": "query",
               "required": false,
               "allowMultiple": false,
@@ -50,15 +50,23 @@
             },
             {
               "name": "priority",
-              "description": "The priority to dial after the endpoint answers. If omitted, uses 1",
+              "description": "The priority to dial after the endpoint answers. If omitted, uses 1. Mutually exclusive with 'app'.",
               "paramType": "query",
               "required": false,
               "allowMultiple": false,
               "dataType": "long"
             },
             {
+              "name": "label",
+              "description": "The label to dial after the endpoint answers. Will supersede 'priority' if provided. Mutually exclusive with 'app'.",
+              "paramType": "query",
+              "required": false,
+              "allowMultiple": false,
+              "dataType": "string"
+            },
+            {
               "name": "app",
-              "description": "The application that is subscribed to the originated channel, and passed to the Stasis application.",
+              "description": "The application that is subscribed to the originated channel. When the channel is answered, it will be passed to this Stasis application. Mutually exclusive with 'context', 'extension', 'priority', and 'label'.",
               "paramType": "query",
               "required": false,
               "allowMultiple": false,
@@ -66,7 +74,7 @@
             },
             {
               "name": "appArgs",
-              "description": "The application arguments to pass to the Stasis application.",
+              "description": "The application arguments to pass to the Stasis application provided by 'app'. Mutually exclusive with 'context', 'extension', 'priority', and 'label'.",
               "paramType": "query",
               "required": false,
               "allowMultiple": false,
@@ -108,6 +116,14 @@
             {
               "name": "otherChannelId",
               "description": "The unique id to assign the second channel when using local channels.",
+              "paramType": "query",
+              "required": false,
+              "allowMultiple": false,
+              "dataType": "string"
+            },
+            {
+              "name": "originator",
+              "description": "The unique id of the channel which is originating this one.",
               "paramType": "query",
               "required": false,
               "allowMultiple": false,
@@ -174,7 +190,7 @@
             },
             {
               "name": "extension",
-              "description": "The extension to dial after the endpoint answers",
+              "description": "The extension to dial after the endpoint answers. Mutually exclusive with 'app'.",
               "paramType": "query",
               "required": false,
               "allowMultiple": false,
@@ -182,7 +198,7 @@
             },
             {
               "name": "context",
-              "description": "The context to dial after the endpoint answers. If omitted, uses 'default'",
+              "description": "The context to dial after the endpoint answers. If omitted, uses 'default'. Mutually exclusive with 'app'.",
               "paramType": "query",
               "required": false,
               "allowMultiple": false,
@@ -190,15 +206,23 @@
             },
             {
               "name": "priority",
-              "description": "The priority to dial after the endpoint answers. If omitted, uses 1",
+              "description": "The priority to dial after the endpoint answers. If omitted, uses 1. Mutually exclusive with 'app'.",
               "paramType": "query",
               "required": false,
               "allowMultiple": false,
               "dataType": "long"
             },
             {
+              "name": "label",
+              "description": "The label to dial after the endpoint answers. Will supersede 'priority' if provided. Mutually exclusive with 'app'.",
+              "paramType": "query",
+              "required": false,
+              "allowMultiple": false,
+              "dataType": "string"
+            },
+            {
               "name": "app",
-              "description": "The application that is subscribed to the originated channel, and passed to the Stasis application.",
+              "description": "The application that is subscribed to the originated channel. When the channel is answered, it will be passed to this Stasis application. Mutually exclusive with 'context', 'extension', 'priority', and 'label'.",
               "paramType": "query",
               "required": false,
               "allowMultiple": false,
@@ -206,7 +230,7 @@
             },
             {
               "name": "appArgs",
-              "description": "The application arguments to pass to the Stasis application.",
+              "description": "The application arguments to pass to the Stasis application provided by 'app'. Mutually exclusive with 'context', 'extension', 'priority', and 'label'.",
               "paramType": "query",
               "required": false,
               "allowMultiple": false,
@@ -240,6 +264,14 @@
             {
               "name": "otherChannelId",
               "description": "The unique id to assign the second channel when using local channels.",
+              "paramType": "query",
+              "required": false,
+              "allowMultiple": false,
+              "dataType": "string"
+            },
+            {
+              "name": "originator",
+              "description": "The unique id of the channel which is originating this one.",
               "paramType": "query",
               "required": false,
               "allowMultiple": false,
@@ -280,7 +312,8 @@
                 "values": [
                   "normal",
                   "busy",
-                  "congestion"
+                  "congestion",
+                  "no_answer"
                 ]
               }
             }
@@ -339,6 +372,14 @@
               "required": false,
               "allowMultiple": false,
               "dataType": "int"
+            },
+            {
+              "name": "label",
+              "description": "The label to continue to - will supersede 'priority' if both are provided.",
+              "paramType": "query",
+              "required": false,
+              "allowMultiple": false,
+              "dataType": "string"
             }
           ],
           "errorResponses": [
@@ -349,6 +390,54 @@
             {
               "code": 409,
               "reason": "Channel not in a Stasis application"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/channels/{channelId}/redirect",
+      "description": "Inform the channel that it should redirect itself to a different location. Note that this will almost certainly cause the channel to exit the application.",
+      "operations": [
+        {
+          "httpMethod": "POST",
+          "summary": "Redirect the channel to a different location.",
+          "nickname": "redirect",
+          "responseClass": "void",
+          "parameters": [
+            {
+              "name": "channelId",
+              "description": "Channel's id",
+              "paramType": "path",
+              "required": true,
+              "allowMultiple": false,
+              "dataType": "string"
+            },
+            {
+              "name": "endpoint",
+              "description": "The endpoint to redirect the channel to",
+              "paramType": "query",
+              "required": true,
+              "allowMultiple": false,
+              "dataType": "string"
+            }
+          ],
+          "errorResponses": [
+            {
+              "code": 400,
+              "reason": "Endpoint parameter not provided"
+            },
+            {
+              "code": 404,
+              "reason": "Channel or endpoint not found"
+            },
+            {
+              "code": 409,
+              "reason": "Channel not in a Stasis application"
+            },
+            {
+              "code": 422,
+              "reason": "Endpoint is not the same type as the channel"
             }
           ]
         }
@@ -881,7 +970,7 @@
         {
           "httpMethod": "POST",
           "summary": "Start playback of media and specify the playbackId.",
-          "notes": "The media URI may be any of a number of URI's. Currently sound: and recording: URI's are supported. This operation creates a playback resource that can be used to control the playback of media (pause, rewind, fast forward, etc.)",
+          "notes": "The media URI may be any of a number of URI's. Currently sound:, recording:, number:, digits:, characters:, and tone: URI's are supported. This operation creates a playback resource that can be used to control the playback of media (pause, rewind, fast forward, etc.)",
           "nickname": "playWithId",
           "responseClass": "Playback",
           "parameters": [
@@ -1109,7 +1198,7 @@
             },
             {
               "code": 404,
-              "reason": "Channel not found"
+              "reason": "Channel or variable not found"
             },
             {
               "code": 409,
@@ -1448,6 +1537,11 @@
           "required": true,
           "type": "Date",
           "description": "Timestamp when channel was created"
+        },
+        "language": {
+          "required": true,
+          "type": "string",
+          "description": "The default spoken language"
         }
       }
     }
