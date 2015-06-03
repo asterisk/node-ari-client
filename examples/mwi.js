@@ -1,6 +1,6 @@
 /**
  *  This example shows how mailbox counts (new/old messages) can be updated
- *  based on live recordings being recorded or played back. 
+ *  based on live recordings being recorded or played back.
  *
  *  @namespace mwi-example
  *
@@ -28,12 +28,12 @@ client.connect('http://ari.js:8088', 'user', 'secret',
      *
      *  @callback connectCallback
      *  @memberof mwi-example
-     *  @param {Error} err - error object if any, null otherwise 
-     *  @param {module:ari-client~Client} ari - ARI client 
-     */  
+     *  @param {Error} err - error object if any, null otherwise
+     *  @param {module:ari-client~Client} ari - ARI client
+     */
     function (err, ari) {
 
-  // Create new mailbox 
+  // Create new mailbox
   var mailbox = ari.Mailbox('mwi-example');
   var messages = 0;
 
@@ -54,7 +54,7 @@ client.connect('http://ari.js:8088', 'user', 'secret',
     channel.on('ChannelDtmfReceived',
         /**
          *  Handle dtmf events. 5 records a message and 6 plays the last
-         *  available message. 
+         *  available message.
          *
          *  @callback channelDtmfReceivedCallback
          *  @memberof mwi-example
@@ -67,10 +67,10 @@ client.connect('http://ari.js:8088', 'user', 'secret',
       var digit = event.digit;
       switch (digit) {
         case '5':
-          // Record message 
+          // Record message
           var recording = ari.LiveRecording();
 
-          recording.on('RecordingFinished',
+          recording.once('RecordingFinished',
               /**
                *  Once the message has been recorded, play an announcement that
                *  the message has been saved and update the mailbox to show the
@@ -85,7 +85,7 @@ client.connect('http://ari.js:8088', 'user', 'secret',
               function (event, newRecording) {
 
             var playback = ari.Playback();
-            playback.on('PlaybackFinished',
+            playback.once('PlaybackFinished',
                 /**
                  *  Once the playback announcing that the message has been saved
                  *  finishes, update the mailbox to show the new message count.
@@ -98,7 +98,7 @@ client.connect('http://ari.js:8088', 'user', 'secret',
                  */
                 function (event, newPlayback) {
 
-              // Update MWI 
+              // Update MWI
               messages += 1;
               var opts = {
                 oldMessages: 0,
@@ -132,7 +132,7 @@ client.connect('http://ari.js:8088', 'user', 'secret',
                *  Iterate through the stored messages. If there are no more
                *  messages, play an announcement that there are no more
                *  messages. Otherwise, play the last available message, delete
-               *  it, and finally update the new message count for the mailbox. 
+               *  it, and finally update the new message count for the mailbox.
                *
                *  @callback listStoredRecordingsCallback
                *  @memberof mwi-example
@@ -152,7 +152,7 @@ client.connect('http://ari.js:8088', 'user', 'secret',
                 function (err) {}
               );
             } else {
-              playback.on('PlaybackFinished',
+              playback.once('PlaybackFinished',
                   /**
                    *  Once the lastest message has been played, delete it and
                    *  update the new message count for the mailbox.
@@ -177,7 +177,7 @@ client.connect('http://ari.js:8088', 'user', 'secret',
                      */
                     function (err) {
 
-                  // Remove MWI 
+                  // Remove MWI
                   messages -= 1;
                   var opts = {
                     oldMessages: 0,
@@ -224,7 +224,7 @@ client.connect('http://ari.js:8088', 'user', 'secret',
 
       var playback = ari.Playback();
 
-      playback.on('PlaybackFinished',
+      playback.once('PlaybackFinished',
           /**
            *  Once playback telling user how to leave a message has finished,
            *  play message telling user how to play the next available message.
@@ -253,7 +253,6 @@ client.connect('http://ari.js:8088', 'user', 'secret',
     });
   });
 
-  // can also use ari.start(['app-name'...]) to start multiple applications 
+  // can also use ari.start(['app-name'...]) to start multiple applications
   ari.start('mwi-example');
 });
-

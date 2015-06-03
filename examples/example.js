@@ -29,12 +29,16 @@ client.connect('http://ari.js:8088', 'user', 'secret',
      *
      *  @callback connectCallback
      *  @memberof example
-     *  @param {Error} err - error object if any, null otherwise 
-     *  @param {module:ari-client~Client} ari - ARI client 
-     */  
+     *  @param {Error} err - error object if any, null otherwise
+     *  @param {module:ari-client~Client} ari - ARI client
+     */
     function (err, ari) {
 
-  // Use once to start the application 
+  if (err) {
+    throw err; // program will crash if it fails to connect
+  }
+
+  // Use once to start the application
   ari.on('StasisStart',
       /**
        *  Setup event listeners for dtmf events, answer channel that entered
@@ -48,7 +52,7 @@ client.connect('http://ari.js:8088', 'user', 'secret',
        */
       function (event, incoming) {
 
-    // Handle DTMF events 
+    // Handle DTMF events
     incoming.on('ChannelDtmfReceived',
         /**
          *  Handle the dtmf event appropriately. # will hangup the channel,
@@ -93,11 +97,11 @@ client.connect('http://ari.js:8088', 'user', 'secret',
    *  @param {module:resources~Channel} channel - the channel to send the
    *    playback to
    *  @param {string} sound - the string identifier of the sound to play
-   *  @param {Function} callback - callback invoked once playback is finished 
+   *  @param {Function} callback - callback invoked once playback is finished
    */
   function play (channel, sound, callback) {
     var playback = ari.Playback();
-    playback.on('PlaybackFinished',
+    playback.once('PlaybackFinished',
         function (event, instance) {
 
       if (callback) {
@@ -107,7 +111,6 @@ client.connect('http://ari.js:8088', 'user', 'secret',
     channel.play({media: sound}, playback, function (err, playback) {});
   }
 
-  // can also use ari.start(['app-name'...]) to start multiple applications 
+  // can also use ari.start(['app-name'...]) to start multiple applications
   ari.start('example');
 });
-
