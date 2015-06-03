@@ -20,7 +20,7 @@
 /*jshint globalstrict: true*/
 
 var client = require('ari-client');
-var Q = require('q')
+var Q = require('q');
 var util = require('util');
 
 // replace ari.js with your Asterisk instance
