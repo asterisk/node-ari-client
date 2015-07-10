@@ -146,6 +146,14 @@ function mockClient (callback) {
       .reply(200, body, headers);
 
     // setup applications URI
+    body = readJsonFixture('asterisk');
+    headers = getJsonHeaders(body);
+    hockServer
+      .get('/ari/api-docs/asterisk.json')
+      .any()
+      .reply(200, body, headers);
+
+    // setup applications URI
     body = readJsonFixture('applications');
     headers = getJsonHeaders(body);
     hockServer

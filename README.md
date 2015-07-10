@@ -151,6 +151,21 @@ ari.applications.unsubscribe(
 
 #### asterisk
 
+##### deleteObject
+
+Delete a dynamic configuration object.
+
+```javascript
+ari.asterisk.deleteObject(
+  {configClass: val, id: val, objectType: val},
+  function (err) {}
+);
+```
+###### Available Parameters
+- configClass (string) - The configuration class containing dynamic configuration objects.
+- id (string) - The unique identifier of the object to delete.
+- objectType (string) - The type of configuration object to delete.
+
 ##### getGlobalVar
 
 Get the value of a global variable.
@@ -176,6 +191,21 @@ ari.asterisk.getInfo(
 ###### Available Parameters
 - only (string) - Filter information returned
 
+##### getObject
+
+Retrieve a dynamic configuration object.
+
+```javascript
+ari.asterisk.getObject(
+  {configClass: val, id: val, objectType: val},
+  function (err, configtuples) {}
+);
+```
+###### Available Parameters
+- configClass (string) - The configuration class containing dynamic configuration objects.
+- id (string) - The unique identifier of the object to retrieve.
+- objectType (string) - The type of configuration object to retrieve.
+
 ##### setGlobalVar
 
 Set the value of a global variable.
@@ -189,6 +219,22 @@ ari.asterisk.setGlobalVar(
 ###### Available Parameters
 - value (string) - The value to set the variable to
 - variable (string) - The variable to set
+
+##### updateObject
+
+Create or update a dynamic configuration object.
+
+```javascript
+ari.asterisk.updateObject(
+  {configClass: val, id: val, objectType: val},
+  function (err, configtuples) {}
+);
+```
+###### Available Parameters
+- configClass (string) - The configuration class containing dynamic configuration objects.
+- fields (containers) - The body object should have a value that is a list of ConfigTuples, which provide the fields to update. Ex. [ { "attribute": "directmedia", "value": "false" } ]
+- id (string) - The unique identifier of the object to create or update.
+- objectType (string) - The type of configuration object to create or update.
 
 #### bridges
 
