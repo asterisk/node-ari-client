@@ -148,6 +148,41 @@ describe('client', function () {
     client.connect(url, user, pass, done);
   });
 
+  it('should auto-reconnect websocket', function (done) {
+    wsserver.reconnect();
+
+    setTimeout(function() {
+      ari.on('PlaybackFinished', function(event, playback) {
+        assert(playback.id === 1);
+
+        done();
+      });
+
+      wsserver.send({
+        type: 'PlaybackFinished',
+        playback: {
+          id: 1
+        }
+      });
+    }, 1000);
+  });
+
+  it('should not auto-reconnect websocket after calling stop', function (done) {
+    ari.stop();
+
+    setTimeout(function() {
+      try {
+        wsserver.send({
+          type: 'PlaybackFinished'
+        });
+      } catch (err) {
+        ari.start('unittests');
+
+        done();
+      }
+    }, 1000);
+  });
+
   it('should have all resources', function (done) {
     var candidates = _.keys(ari);
     var expected = [
@@ -416,7 +451,7 @@ describe('client', function () {
     });
 
     it('should allow passing function variables to client or resource',
-        function(done) {
+        function (done) {
 
       var channel = ari.Channel();
       var body = '{"variables":{"CALLERID(name)":"Alice"}}';
@@ -443,6 +478,7 @@ describe('client', function () {
         app: 'unittests',
         variables: {'CALLERID(name)': 'Alice'}
       };
+
       ari.channels.originate(options, function(err, channel) {
         if (!err) {
           channel.originate(options, function(err, channel) {
@@ -455,7 +491,7 @@ describe('client', function () {
     });
 
     it('should allow passing standard variables to client or resource',
-        function(done) {
+        function (done) {
 
       var channel = ari.Channel();
       var body = '{"variables":{"CUSTOM":"myvar"}}';
@@ -482,9 +518,10 @@ describe('client', function () {
         app: 'unittests',
         variables: {'CUSTOM': 'myvar'}
       };
-      ari.channels.originate(options, function(err, channel) {
+
+      ari.channels.originate(options, function (err, channel) {
         if (!err) {
-          channel.originate(options, function(err, channel) {
+          channel.originate(options, function (err, channel) {
             if (!err) {
               done();
             }

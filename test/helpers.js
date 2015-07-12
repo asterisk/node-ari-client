@@ -34,9 +34,7 @@ function createWebSocketServer (httpserver) {
   var server = new ws.Server({server: httpserver});
   var socket = null;
 
-  server.on('connection', function (websocket) {
-    socket = websocket;
-  });
+  server.on('connection', processConnection);
 
   /**
    *  Web socket server with a send method that will send a message to a
@@ -47,12 +45,38 @@ function createWebSocketServer (httpserver) {
    *  @property {Function} send - send a message to the listening socket
    */
   return {
+    /**
+     *  Sends the json message to the currently connected socket.
+     *
+     *  @param {Object} msg - the json message to send
+     */
     send: function (msg) {
       if (socket) {
         socket.send(JSON.stringify(msg));
       }
+    },
+
+    /**
+     *  Disconnects the server and reconnects.
+     *
+     *  This is intended to test client auto-reconnect.
+     */
+    reconnect: function() {
+      server.close(function() {
+        server = new ws.Server({server: httpserver});
+        server.on('connection', processConnection);
+      });
     }
   };
+
+  /**
+   *  Store the incoming websocket for future use.
+   *
+   *  @param {WebSocket} socket - socket for the last connection
+   */
+  function processConnection(websocket) {
+    socket = websocket;
+  }
 }
 
 /**
@@ -180,7 +204,7 @@ function mockClient (callback) {
  *  @memberof module:tests-helpers
  *  @private
  *  @param {string} filename - the name of the fixture
- *  @returns {string} the string representation of the json fixture 
+ *  @returns {string} the string representation of the json fixture
  */
 function readJsonFixture (filename) {
   // remove the last newline if it exists
@@ -213,4 +237,3 @@ function getJsonHeaders (json) {
 module.exports.mockClient = mockClient;
 module.exports.getJsonHeaders = getJsonHeaders;
 module.exports.createWebSocketServer = createWebSocketServer;
-

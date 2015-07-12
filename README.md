@@ -1217,6 +1217,14 @@ ARI client failed to load.
 function (err) {}
 ```
 
+#### WebSocketMaxRetries
+
+Client will no longer attempt to reconnect to the WebSocket for the current application(s).
+
+```JavaScript
+function (err) {}
+```
+
 #### ApplicationReplaced
 
 Notification that another WebSocket has taken over for an application.
