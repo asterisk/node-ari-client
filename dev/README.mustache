@@ -189,15 +189,13 @@ function (err) {}
 
 # Examples
 
-Replace ari.js with your Asterisk instance.
-
 Callbacks:
 
 ```javascript
 var client = require('ari-client'),
     util = require('util');
 
-client.connect('http://ari.js:8088', 'user', 'secret', client_loaded);
+client.connect('http://localhost:8088', 'user', 'secret', client_loaded);
 
 function client_loaded (err, ari) {
 
@@ -253,10 +251,10 @@ Promises:
 
 ```javascript
 var client = require('ari-client'),
-    Q = require('q'),
+    Promise = require('bluebird'),
     util = require('util');
 
-client.connect('http://ari.js:8088', 'user', 'secret')
+client.connect('http://localhost:8088', 'user', 'secret')
   .then(function (ari) {
 
     ari.once('StasisStart', channelJoined);
@@ -292,19 +290,18 @@ client.connect('http://ari.js:8088', 'user', 'secret')
     }
 
     function play (channel, sound) {
-      var deferred = Q.defer();
       var playback = ari.Playback();
 
-      playback.on('PlaybackFinished', function (event, playback) {
-        deferred.resolve(playback);
-      });
-
-      channel.play({media: sound}, playback)
-        .catch(function (err) {
-          deferred.reject(err);
+      return new Promise(function (resolve, reject) {
+        playback.on('PlaybackFinished', function (event, playback) {
+          resolve(playback);
         });
 
-      return deferred.promise;
+        channel.play({media: sound}, playback)
+          .catch(function (err) {
+            reject(err);
+          });
+      });
     }
 
     ari.start('hello');
