@@ -22,10 +22,11 @@
   "license": "Apache-2.0",
   "author": "Samuel Fortier-Galarneau",
   "dependencies": {
+    "node-uuid": "^1.4.1",
+    "request": "^2.53.0",
     "swagger-client": "^2.0.26",
-    "ws": "^0.4.31",
     "underscore": "^1.6.0",
-    "node-uuid": "^1.4.1"
+    "ws": "^0.4.31"
   },
   "engines": {
     "node": ">=0.10.0"
@@ -41,7 +42,6 @@
     "istanbul": "^0.3.2",
     "mocha": "^1.17.1",
     "moment": "^2.6.0",
-    "mustache": "^0.8.1",
-    "request": "^2.34.0"
+    "mustache": "^0.8.1"
   }
 }

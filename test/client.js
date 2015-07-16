@@ -148,6 +148,15 @@ describe('client', function () {
     client.connect(url, user, pass, done);
   });
 
+  it('should send an error if host is not reachable', function(done) {
+    url = 'http://notthere:8088';
+    client.connect(url, user, pass, function(err, newClient) {
+      if (err && err.name === 'HostIsNotReachable') {
+        done();
+      }
+    });
+  });
+
   it('should have all resources', function (done) {
     var candidates = _.keys(ari);
     var expected = [
