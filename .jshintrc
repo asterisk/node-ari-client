@@ -13,5 +13,8 @@
   "node": true,
   "quotmark": true,
   "camelcase": true,
-  "maxlen": 80
+  "maxlen": 80,
+  "globals": {
+    "Promise" : true
+  }
 }

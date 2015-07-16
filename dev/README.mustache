@@ -17,9 +17,20 @@ $ npm install ari-client
 The client exposes a connect function that can be used to connect to an instance
 of ARI and to configure a client with all available resources and operations.
 
+Callbacks:
+
 ```javascript
 var client = require('ari-client');
 client.connect(url, username, password, function (err, ari) {})
+```
+
+Promises:
+
+```javascript
+var client = require('ari-client');
+client.connect(url, username, password)
+  .then(function (ari) {})
+  .catch(function (err) {});
 ```
 
 Upon connecting, a callback will be called passing a reference to a client with
@@ -31,9 +42,23 @@ ari.bridges, ari.channels, ari.endpoints...
 
 Those properties expose operations that can be performed for that given resource.
 
+Callbacks:
+
 ```javascript
 ari.bridges.list(function (err, bridges) {});
 ari.bridges.get({bridgeId: 'uniqueid'}, function (err, bridge) {});
+```
+
+Promises:
+
+```javascript
+ari.bridges.list()
+  .then(function (bridges) {})
+  .catch(function (err) {});
+
+ari.bridges.get({bridgeId: 'uniqueid'})
+  .then(function (bridge) {})
+  .catch(function (err) {});
 ```
 
 Operations that return a resource or a list of resources expose the same operations tied to that given instance.
@@ -56,14 +81,27 @@ ari.Bridge(), ari.Channel(), ari.Playback(), ari.LiveRecording()
 
 The instance returned by these functions can then be used to call a create operations in ARI.
 
+Callbacks:
+
 ```javascript
 var bridge = ari.Bridge();
 bridge.create(function (err, bridge) {});
 ```
 
+Promises:
+
+```javascript
+var bridge = ari.Bridge();
+bridge.create().
+  .then(function (bridge) {})
+  .catch(function (err) {});
+```
+
 Note that the create operation returns an updated copy of the bridge after creation.
 
 Using this method of resource creation, it is possible to register event listeners for a resource before it is created in ARI.
+
+Callbacks:
 
 ```javascript
 var channel = ari.Channel();
@@ -71,18 +109,42 @@ channel.on('StasisStart', function (event, channel) {});
 channel.on('ChannelDtmfReceived', function (event, channel) {});
 channel.originate(
     {endpoint: 'SIP/1000', app: 'application', appArgs: 'dialed'},
-    function(err, channel) {}
+    function (err, channel) {}
 );
 ```
 
+Promises:
+
+```javascript
+var channel = ari.Channel();
+channel.on('StasisStart', function (event, channel) {});
+channel.on('ChannelDtmfReceived', function (event, channel) {});
+channel.originate({endpoint: 'SIP/1000', app: 'application', appArgs: 'dialed'})
+  .then(function (channel) {})
+  .catch(function (err) {});
+```
+
 Some create operations require an instance be passed in for this to work.
+
+Callbacks:
 
 ```javascript
 var playback = ari.Playback();
 channel.play({media: 'sound:hello-world'}, playback, function (err, playback) {});
 ```
 
+Promises:
+
+```javascript
+var playback = ari.Playback();
+channel.play({media: 'sound:hello-world'}, playback)
+  .then(function (playback) {})
+  .catch(function (err) {});
+```
+
 If you are using the client directly to call a create operation instead of using an instance, you will have to pass the appropriate ids as part of the options to the create operation.
+
+Callbacks:
 
 ```javascript
 var playback = ari.Playback();
@@ -91,6 +153,17 @@ ari.channels.play({
   channelId: channel.id,
   playbackId: playback.id
 }, function (err, playback) {});
+```
+
+Promises:
+
+```javascript
+var playback = ari.Playback();
+ari.channels.play({
+  media: 'sound:hello-world',
+  channelId: channel.id,
+  playbackId: playback.id
+}).then(function (playback) {}).catch(function (err) {});
 ```
 
 ### Operations
@@ -118,6 +191,8 @@ function (err) {}
 
 Replace ari.js with your Asterisk instance.
 
+Callbacks:
+
 ```javascript
 var client = require('ari-client'),
     util = require('util');
@@ -126,46 +201,115 @@ client.connect('http://ari.js:8088', 'user', 'secret', client_loaded);
 
 function client_loaded (err, ari) {
 
-    ari.once('StasisStart', channel_joined);
+  if (err) {
+    throw err; // program will crash if it fails to connect
+  }
 
-    function channel_joined (event, incoming) {
-        incoming.on('ChannelDtmfReceived', dtmf_received);
+  ari.once('StasisStart', channel_joined);
 
-        incoming.answer(function (err) {
-            play(incoming, 'sound:hello-world');
+  function channel_joined (event, incoming) {
+    incoming.on('ChannelDtmfReceived', dtmf_received);
+
+    incoming.answer(function (err) {
+      play(incoming, 'sound:hello-world');
+    });
+  }
+
+  function dtmf_received (event, channel) {
+    var digit = event.digit;
+    switch (digit) {
+      case '#':
+        play(channel, 'sound:vm-goodbye', function (err) {
+          channel.hangup(function (err) {
+            process.exit(0);
+          });
         });
+        break;
+      case '*':
+        play(channel, 'sound:tt-monkeys');
+        break;
+      default:
+        play(channel, util.format('sound:digits/%s', digit));
+    }
+  }
+
+  function play (channel, sound, callback) {
+    var playback = ari.Playback();
+
+    playback.on('PlaybackFinished', function (event, playback) {
+      if (callback) {
+        callback(null);
+      }
+    });
+
+    channel.play({media: sound}, playback, function (err, playback) {});
+  }
+
+  ari.start('hello');
+}
+```
+
+Promises:
+
+```javascript
+var client = require('ari-client'),
+    Q = require('q'),
+    util = require('util');
+
+client.connect('http://ari.js:8088', 'user', 'secret')
+  .then(function (ari) {
+
+    ari.once('StasisStart', channelJoined);
+
+    function channelJoined (event, incoming) {
+      incoming.on('ChannelDtmfReceived', dtmfReceived);
+
+      incoming.answer()
+        .then(function () {
+          return play(incoming, 'sound:hello-world');
+        })
+        .catch(function (err) {});
     }
 
-    function dtmf_received (event, channel) {
-        var digit = event.digit;
-        switch (digit) {
-            case '#':
-                play(channel, 'sound:vm-goodbye', function (err) {
-                    channel.hangup(function (err) {
-                        process.exit(0);
-                    });
-                });
-                break;
-            case '*':
-                play(channel, 'sound:tt-monkeys');
-                break;
-            default:
-                play(channel, util.format('sound:digits/%s', digit));
-        }
+    function dtmfReceived (event, channel) {
+      var digit = event.digit;
+      switch (digit) {
+        case '#':
+          play(channel, 'sound:vm-goodbye')
+            .then(function () {
+              return channel.hangup();
+            })
+            .finally(function () {
+              process.exit(0);
+            });
+          break;
+        case '*':
+          play(channel, 'sound:tt-monkeys');
+          break;
+        default:
+          play(channel, util.format('sound:digits/%s', digit));
+      }
     }
 
-    function play (channel, sound, callback) {
-        var playback = ari.Playback();
-        playback.on('PlaybackFinished', function (event, playback) {
-            if (callback) {
-                callback(null);
-            }
+    function play (channel, sound) {
+      var deferred = Q.defer();
+      var playback = ari.Playback();
+
+      playback.on('PlaybackFinished', function (event, playback) {
+        deferred.resolve(playback);
+      });
+
+      channel.play({media: sound}, playback)
+        .catch(function (err) {
+          deferred.reject(err);
         });
-        channel.play({media: sound}, playback, function (err, playback) { });
+
+      return deferred.promise;
     }
 
     ari.start('hello');
-}
+  })
+  .done(); // program will crash if it fails to connect
 ```
 
 # Testing

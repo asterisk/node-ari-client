@@ -30,21 +30,21 @@ client.connect('http://ari.js:8088', 'user', 'secret',
      *
      *  @callback connectCallback
      *  @memberof playback-example
-     *  @param {Error} err - error object if any, null otherwise 
-     *  @param {module:ari-client~Client} ari - ARI client 
-     */  
+     *  @param {Error} err - error object if any, null otherwise
+     *  @param {module:ari-client~Client} ari - ARI client
+     */
     function (err, ari) {
 
-  // Use once to start the application 
+  // Use once to start the application
   ari.once('StasisStart',
       /**
        *  Once the incoming channel has entered Stasis, answer it, play demo
-       *  sound and register dtmf event listeners to control the playback. 
+       *  sound and register dtmf event listeners to control the playback.
        *
        *  @callback stasisStartCallback
        *  @memberof playback-example
        *  @param {Object} event - the full event object
-       *  @param {module:resources~Channel} incoming - the channel entering 
+       *  @param {module:resources~Channel} incoming - the channel entering
        *    Stasis
        */
       function (event, incoming) {
@@ -130,7 +130,6 @@ client.connect('http://ari.js:8088', 'user', 'secret',
     });
   }
 
-  // can also use ari.start(['app-name'...]) to start multiple applications 
+  // can also use ari.start(['app-name'...]) to start multiple applications
   ari.start('playback-example');
 });
-

@@ -24,7 +24,7 @@ module.exports = function(grunt) {
       options: {
         jshintrc: true
       },
-      all: ['Gruntfile.js', 'lib/*.js', 'test/*.js']
+      all: ['Gruntfile.js', 'lib/**/*.js', 'test/**/*.js', 'examples/**/*.js']
     },
 
     mochaTest: {
@@ -62,7 +62,7 @@ module.exports = function(grunt) {
           'test/*.js',
           'Gruntfile.js',
           'README.md'
-        ], 
+        ],
         options: {
           destination: 'doc'
         }
@@ -134,7 +134,7 @@ module.exports = function(grunt) {
       )
     );
 
-    // Connect to API using swagger and attach resources on Client instance 
+    // Connect to API using swagger and attach resources on Client instance
     var resourcesUrl = util.format(
       '%s//%s/ari/api-docs/resources.json',
       parsedUrl.protocol,
@@ -146,7 +146,7 @@ module.exports = function(grunt) {
       failure: swaggerFailed
     });
 
-    // Swagger success callback 
+    // Swagger success callback
     function swaggerLoaded () {
       if(swaggerClient.ready === true) {
         grunt.log.writeln('generating operations documentation');
@@ -199,6 +199,7 @@ module.exports = function(grunt) {
             results += util.format(', %s', returnType);
           }
           var params = '';
+          var paramsPromises = '';
           var requiredParams = [];
           var availableParams = [];
           var parameters = _.sortBy(operation.parameters, 'name');
@@ -219,8 +220,14 @@ module.exports = function(grunt) {
             );
           });
           if (requiredParams.length > 0) {
-            params = util.format('{%s}', requiredParams.join(', '));
+            params = util.format(
+              '{%s}', requiredParams.join(', ')
+            );
             params += ',\n  ';
+
+            paramsPromises = util.format(
+              '{\n    %s\n}', requiredParams.join(',\n    ')
+            );
           }
 
           operations += mustache.render(operationTemplate, {
@@ -228,7 +235,9 @@ module.exports = function(grunt) {
             desc: operation.summary,
             resource: operation.resourceName,
             params: params,
-            results: results
+            paramsPromises: paramsPromises,
+            results: results,
+            resultsPromises: results.substring(2)
           });
 
           if (availableParams.length > 0) {
@@ -298,7 +307,7 @@ module.exports = function(grunt) {
 
         if (instances.length > 0) {
           events += util.format(
-            '##### Resource Specific Emitters \n%s\n\n',
+            '##### Resource Specific Emitters\n%s\n\n',
             instances.join('\n')
           );
         }
@@ -364,4 +373,3 @@ module.exports = function(grunt) {
     }
   });
 };
-
