@@ -42,6 +42,7 @@
     "mocha": "^1.17.1",
     "moment": "^2.6.0",
     "mustache": "^0.8.1",
+    "portfinder": "^0.4.0",
     "request": "^2.34.0"
   }
 }

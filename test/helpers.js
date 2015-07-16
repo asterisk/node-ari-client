@@ -20,6 +20,7 @@ var fs = require('fs');
 var util = require('util');
 var moment = require('moment');
 var ws = require('ws');
+var portfinder = require('portfinder');
 
 /**
  *  Creates a web socket server that can be used to send messages to a unit test
@@ -56,17 +57,37 @@ function createWebSocketServer (httpserver) {
 }
 
 /**
+ *  Sets up a hock API mock on an open port to support running
+ *  ari-hockServer.connect.
+ *
+ *  @function mockClient
+ *  @memberof module:tests-helpers
+ *  @param {Function} callback - invoked with hock server and port once
+ *                               mocking complete
+ */
+function mockClient(callback) {
+  portfinder.getPort(function(err, port) {
+    if (err) {
+      throw err;
+    }
+
+    buildMockClient(port, callback);
+  });
+}
+
+/**
  *  Sets up a hock API mock to support running ari-hockServer.connect.
  *
  *  @function mockClient
  *  @memberof module:tests-helpers
- *  @param {Function} callback - invoked with hock server once mocking complete
+ *  @param {integer} port - the port to run the server on
+ *  @param {Function} callback - invoked with hock server and port once
+ *                               mocking complete
  */
-function mockClient (callback) {
-
-  hock.createHock(8088, function (err, hockServer) {
+function buildMockClient (port, callback) {
+  hock.createHock(port, function (err, hockServer) {
     // setup resources URI
-    var body = readJsonFixture('resources');
+    var body = readJsonFixture('resources', port);
     var headers = getJsonHeaders(body);
     hockServer
       .get('/ari/api-docs/resources.json')
@@ -74,7 +95,7 @@ function mockClient (callback) {
       .reply(200, body, headers);
 
     // setup recordings URI
-    body = readJsonFixture('recordings');
+    body = readJsonFixture('recordings', port);
     headers = getJsonHeaders(body);
     hockServer
       .get('/ari/api-docs/recordings.json')
@@ -82,7 +103,7 @@ function mockClient (callback) {
       .reply(200, body, headers);
 
     // setup bridges URI
-    body = readJsonFixture('bridges');
+    body = readJsonFixture('bridges', port);
     headers = getJsonHeaders(body);
     hockServer
       .get('/ari/api-docs/bridges.json')
@@ -90,7 +111,7 @@ function mockClient (callback) {
       .reply(200, body, headers);
 
     // setup endpoints URI
-    body = readJsonFixture('endpoints');
+    body = readJsonFixture('endpoints', port);
     headers = getJsonHeaders(body);
     hockServer
       .get('/ari/api-docs/endpoints.json')
@@ -98,7 +119,7 @@ function mockClient (callback) {
       .reply(200, body, headers);
 
     // setup asterisk URI
-    body = readJsonFixture('asterisk');
+    body = readJsonFixture('asterisk', port);
     headers = getJsonHeaders(body);
     hockServer
       .get('/ari/api-docs/asterisk.json')
@@ -106,7 +127,7 @@ function mockClient (callback) {
       .reply(200, body, headers);
 
     // setup sounds URI
-    body = readJsonFixture('sounds');
+    body = readJsonFixture('sounds', port);
     headers = getJsonHeaders(body);
     hockServer
       .get('/ari/api-docs/sounds.json')
@@ -114,7 +135,7 @@ function mockClient (callback) {
       .reply(200, body, headers);
 
     // setup channels URI
-    body = readJsonFixture('channels');
+    body = readJsonFixture('channels', port);
     headers = getJsonHeaders(body);
     hockServer
       .get('/ari/api-docs/channels.json')
@@ -122,7 +143,7 @@ function mockClient (callback) {
       .reply(200, body, headers);
 
     // setup playbacks URI
-    body = readJsonFixture('playbacks');
+    body = readJsonFixture('playbacks', port);
     headers = getJsonHeaders(body);
     hockServer
       .get('/ari/api-docs/playbacks.json')
@@ -130,7 +151,7 @@ function mockClient (callback) {
       .reply(200, body, headers);
 
     // setup deviceStates URI
-    body = readJsonFixture('deviceStates');
+    body = readJsonFixture('deviceStates', port);
     headers = getJsonHeaders(body);
     hockServer
       .get('/ari/api-docs/deviceStates.json')
@@ -138,7 +159,7 @@ function mockClient (callback) {
       .reply(200, body, headers);
 
     // setup mailboxes URI
-    body = readJsonFixture('mailboxes');
+    body = readJsonFixture('mailboxes', port);
     headers = getJsonHeaders(body);
     hockServer
       .get('/ari/api-docs/mailboxes.json')
@@ -154,7 +175,7 @@ function mockClient (callback) {
       .reply(200, body, headers);
 
     // setup applications URI
-    body = readJsonFixture('applications');
+    body = readJsonFixture('applications', port);
     headers = getJsonHeaders(body);
     hockServer
       .get('/ari/api-docs/applications.json')
@@ -162,14 +183,14 @@ function mockClient (callback) {
       .reply(200, body, headers);
 
     // setup events URI
-    body = readJsonFixture('events');
+    body = readJsonFixture('events', port);
     headers = getJsonHeaders(body);
     hockServer
       .get('/ari/api-docs/events.json')
       .any()
       .reply(200, body, headers);
 
-    callback(err, hockServer);
+    callback(err, hockServer, port);
   });
 }
 
@@ -180,14 +201,17 @@ function mockClient (callback) {
  *  @memberof module:tests-helpers
  *  @private
  *  @param {string} filename - the name of the fixture
+ *  @param {integer} port - the port the server is running on
  *  @returns {string} the string representation of the json fixture 
  */
-function readJsonFixture (filename) {
+function readJsonFixture (filename, port) {
   // remove the last newline if it exists
   var json = fs.readFileSync(
     util.format('%s/fixtures/%s.json', __dirname, filename),
     'utf8'
-  ).replace(/\n$/, '');
+  )
+  .replace(/\n$/, '')
+  .replace(/8088/g, port);
   return json;
 }
 
