@@ -152,6 +152,41 @@ describe('client', function () {
     client.connect(url, user, pass, done);
   });
 
+  it('should auto-reconnect websocket', function (done) {
+    wsserver.reconnect();
+
+    setTimeout(function() {
+      ari.on('PlaybackFinished', function(event, playback) {
+        assert(playback.id === 1);
+
+        done();
+      });
+
+      wsserver.send({
+        type: 'PlaybackFinished',
+        playback: {
+          id: 1
+        }
+      });
+    }, 1000);
+  });
+
+  it('should not auto-reconnect websocket after calling stop', function (done) {
+    ari.stop();
+
+    setTimeout(function() {
+      try {
+        wsserver.send({
+          type: 'PlaybackFinished'
+        });
+      } catch (err) {
+        ari.start('unittests');
+
+        done();
+      }
+    }, 1000);
+  });
+
   it('should connect using promises', function (done) {
     client.connect(url, user, pass).then(function (client) {
       if (client) {
