@@ -1,6 +1,6 @@
 {
   "name": "ari-client",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "JavaScript client for Asterisk REST Interface.",
   "homepage": "https://github.com/asterisk/node-ari-client",
   "keywords": [
@@ -22,6 +22,7 @@
   "license": "Apache-2.0",
   "author": "Samuel Fortier-Galarneau",
   "dependencies": {
+    "backoff-func": "^0.1.2",
     "bluebird": "^2.9.34",
     "node-uuid": "^1.4.1",
     "swagger-client": "^2.0.26",
