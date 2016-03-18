@@ -272,6 +272,58 @@ ari.applications.unsubscribe({
 
 #### asterisk
 
+##### addLog
+
+Adds a log channel.
+
+Callbacks:
+
+```javascript
+ari.asterisk.addLog(
+  {configuration: val, logChannelName: val},
+  function (err) {}
+);
+```
+
+Promises:
+
+```javascript
+ari.asterisk.addLog({
+    configuration: val,
+    logChannelName: val
+})
+  .then(function () {})
+  .catch(function (err) {});
+```
+###### Available Parameters
+- configuration (string) - levels of the log channel
+- logChannelName (string) - The log channel to add
+
+##### deleteLog
+
+Deletes a log channel.
+
+Callbacks:
+
+```javascript
+ari.asterisk.deleteLog(
+  {logChannelName: val},
+  function (err) {}
+);
+```
+
+Promises:
+
+```javascript
+ari.asterisk.deleteLog({
+    logChannelName: val
+})
+  .then(function () {})
+  .catch(function (err) {});
+```
+###### Available Parameters
+- logChannelName (string) - Log channels name
+
 ##### deleteObject
 
 Delete a dynamic configuration object.
@@ -348,6 +400,31 @@ ari.asterisk.getInfo()
 ###### Available Parameters
 - only (string) - Filter information returned
 
+##### getModule
+
+Get Asterisk module information.
+
+Callbacks:
+
+```javascript
+ari.asterisk.getModule(
+  {moduleName: val},
+  function (err, module) {}
+);
+```
+
+Promises:
+
+```javascript
+ari.asterisk.getModule({
+    moduleName: val
+})
+  .then(function (module) {})
+  .catch(function (err) {});
+```
+###### Available Parameters
+- moduleName (string) - Module's name
+
 ##### getObject
 
 Retrieve a dynamic configuration object.
@@ -377,6 +454,119 @@ ari.asterisk.getObject({
 - id (string) - The unique identifier of the object to retrieve.
 - objectType (string) - The type of configuration object to retrieve.
 
+##### listLogChannels
+
+Gets Asterisk log channel information.
+
+Callbacks:
+
+```javascript
+ari.asterisk.listLogChannels(
+  function (err, logchannels) {}
+);
+```
+
+Promises:
+
+```javascript
+ari.asterisk.listLogChannels()
+  .then(function (logchannels) {})
+  .catch(function (err) {});
+```
+##### listModules
+
+List Asterisk modules.
+
+Callbacks:
+
+```javascript
+ari.asterisk.listModules(
+  function (err, modules) {}
+);
+```
+
+Promises:
+
+```javascript
+ari.asterisk.listModules()
+  .then(function (modules) {})
+  .catch(function (err) {});
+```
+##### loadModule
+
+Load an Asterisk module.
+
+Callbacks:
+
+```javascript
+ari.asterisk.loadModule(
+  {moduleName: val},
+  function (err) {}
+);
+```
+
+Promises:
+
+```javascript
+ari.asterisk.loadModule({
+    moduleName: val
+})
+  .then(function () {})
+  .catch(function (err) {});
+```
+###### Available Parameters
+- moduleName (string) - Module's name
+
+##### reloadModule
+
+Reload an Asterisk module.
+
+Callbacks:
+
+```javascript
+ari.asterisk.reloadModule(
+  {moduleName: val},
+  function (err) {}
+);
+```
+
+Promises:
+
+```javascript
+ari.asterisk.reloadModule({
+    moduleName: val
+})
+  .then(function () {})
+  .catch(function (err) {});
+```
+###### Available Parameters
+- moduleName (string) - Module's name
+
+##### rotateLog
+
+Rotates a log channel.
+
+Callbacks:
+
+```javascript
+ari.asterisk.rotateLog(
+  {logChannelName: val},
+  function (err) {}
+);
+```
+
+Promises:
+
+```javascript
+ari.asterisk.rotateLog({
+    logChannelName: val
+})
+  .then(function () {})
+  .catch(function (err) {});
+```
+###### Available Parameters
+- logChannelName (string) - Log channel's name
+
 ##### setGlobalVar
 
 Set the value of a global variable.
@@ -402,6 +592,31 @@ ari.asterisk.setGlobalVar({
 ###### Available Parameters
 - value (string) - The value to set the variable to
 - variable (string) - The variable to set
+
+##### unloadModule
+
+Unload an Asterisk module.
+
+Callbacks:
+
+```javascript
+ari.asterisk.unloadModule(
+  {moduleName: val},
+  function (err) {}
+);
+```
+
+Promises:
+
+```javascript
+ari.asterisk.unloadModule({
+    moduleName: val
+})
+  .then(function () {})
+  .catch(function (err) {});
+```
+###### Available Parameters
+- moduleName (string) - Module's name
 
 ##### updateObject
 
@@ -2223,14 +2438,6 @@ ARI client failed to load.
 function (err) {}
 ```
 
-#### WebSocketMaxRetries
-
-Client will no longer attempt to reconnect to the WebSocket for the current application(s).
-
-```JavaScript
-function (err) {}
-```
-
 #### ApplicationReplaced
 
 Notification that another WebSocket has taken over for an application.
@@ -2566,6 +2773,33 @@ If missing, the variable is a global variable.
 ##### Resource Specific Emitters
 Channel
 
+#### ContactInfo
+
+Detailed information about a contact on an endpoint.
+
+```javascript
+function (event) {}
+```
+##### Available Event Properties
+- aor (string) - The Address of Record this contact belongs to.
+- contact_status (string) - The current status of the contact.
+- roundtrip_usec (string) - Current round trip time, in microseconds, for the contact.
+- uri (string) - The location of the contact.
+
+#### ContactStatusChange
+
+The state of a contact on an endpoint has changed.
+
+```javascript
+function (event, endpoint) {}
+```
+##### Available Event Properties
+- contact_info (ContactInfo) - undefined
+- endpoint (Endpoint) - undefined
+
+##### Resource Specific Emitters
+Endpoint
+
 #### DeviceStateChanged
 
 Notification that a device state has changed.
@@ -2619,6 +2853,34 @@ function (event) {}
 ```
 ##### Available Event Properties
 - params (List[string]) - A list of the missing parameters
+
+#### Peer
+
+Detailed information about a remote peer that communicates with Asterisk.
+
+```javascript
+function (event) {}
+```
+##### Available Event Properties
+- address (string) - The IP address of the peer.
+- cause (string) - An optional reason associated with the change in peer_status.
+- peer_status (string) - The current state of the peer. Note that the values of the status are dependent on the underlying peer technology.
+- port (string) - The port of the peer.
+- time (string) - The last known time the peer was contacted.
+
+#### PeerStatusChange
+
+The state of a peer associated with an endpoint has changed.
+
+```javascript
+function (event, endpoint) {}
+```
+##### Available Event Properties
+- endpoint (Endpoint) - undefined
+- peer (Peer) - undefined
+
+##### Resource Specific Emitters
+Endpoint
 
 #### PlaybackFinished
 
@@ -2728,6 +2990,30 @@ function (event, endpoint) {}
 Endpoint
 
 
+
+#### WebSocketReconnecting
+
+WebSocket has disconnected, and the client is attempting to reconnect.
+
+```JavaScript
+function (err) {}
+```
+
+#### WebSocketConnected
+
+WebSocket has connected. Note that normally this event is emitted prior to resolving the `connect()` promise, so you probably will not get an even on the initial connection.
+
+```JavaScript
+function () {}
+```
+
+#### WebSocketMaxRetries
+
+Client will no longer attempt to reconnect to the WebSocket for the current application(s).
+
+```JavaScript
+function (err) {}
+```
 
 # Examples
 

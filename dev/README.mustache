@@ -187,6 +187,22 @@ function (err) {}
 
 {{{events}}}
 
+#### WebSocketReconnecting
+
+WebSocket has disconnected, and the client is attempting to reconnect.
+
+```JavaScript
+function (err) {}
+```
+
+#### WebSocketConnected
+
+WebSocket has connected. Note that normally this event is emitted prior to resolving the `connect()` promise, so you probably will not get an even on the initial connection.
+
+```JavaScript
+function () {}
+```
+
 #### WebSocketMaxRetries
 
 Client will no longer attempt to reconnect to the WebSocket for the current application(s).
