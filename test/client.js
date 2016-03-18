@@ -187,6 +187,47 @@ describe('client', function () {
     }, 1000);
   });
 
+  it('send reconnect lifecycle events', function (done) {
+    client.connect(url, user, pass, function (err) {
+      if (err) { return done(err); }
+      wsserver.reconnect();
+      ari.once('WebSocketReconnecting', function () {
+        ari.once('WebSocketConnected', function () {
+          done();
+        });
+      });
+    });
+  });
+
+  it('can reconnect a lot if it can successfully connect', function (done) {
+    var reconnectCount = 20;
+
+    // this test might be a bit slow
+    this.timeout(60000);
+
+    client.connect(url, user, pass, function (err) {
+      if (err) { return done(err); }
+
+      function doItAgain() {
+        if (reconnectCount-- == 0) {
+          done();
+          return;
+        }
+
+        wsserver.reconnect();
+        ari.once('WebSocketConnected', function () {
+          doItAgain();
+        });
+
+        ari.once('WebSocketMaxRetries', function () {
+          assert.fail('Should not have given up reconnecting');
+        });
+      }
+
+      doItAgain();
+    });
+  });
+
   it('should connect using promises', function (done) {
     client.connect(url, user, pass).then(function (client) {
       if (client) {
