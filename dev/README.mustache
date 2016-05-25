@@ -173,11 +173,96 @@ The following operations are defined:
 {{{operations}}}
 ### Events
 
-Event listeners can be registered on the client as well as on resource instances. Note that resource instance listeners are tied to the instance while client listeners receive all events of a given type regardless of which resource the event is for.
+Event listeners can be registered on the client as well as on resource instances.
+
+#### Client Events
+
+Client events are received for all events of a given type regardless of which resource the event is for.
+
+```javascript
+ari.on('StasisStart', function (event, channelInstance) {
+    // will be called for all channels that enter the Stasis application
+});
+```
+
+#### Resource Instance Events
+
+Resource instance events are only received for the given type and resource.
+
+Callbacks:
+
+```javascript
+var channel = ari.Channel();
+channel.on('StasisStart', function (event, channelInstance) {
+    // will only be called when the channel above enters the Stasis application
+});
+
+channel.originate(
+  {endpoint: 'PJSIP/endpoint', app: 'applicationName'},
+  function (err, channelInstance) {}
+);
+```
+
+Promises:
+
+```javascript
+var channel = ari.Channel();
+channel.on('StasisStart', function (event, channelInstance) {
+    // will only be called when the channel above enters the Stasis application
+});
+
+channel.originate({endpoint: 'PJSIP/endpoint', app: 'applicationName'})
+  .then(function (channelInstance) {})
+  .catch(function (err) {});
+```
+
+#### Managing Events
+
+When using events, it is important to remember that the callbacks you provide to handle events cannot be garbage collected until they are unregistered as shown below.
+
+```javascript
+var channel = ari.Channel();
+var handler = function (event, channel) {};
+
+channel.on('ChannelDtmfReceived', handler);
+
+// at some point in your application, remove the event listener to ensure the handler function can be garbage collected
+channel.removeListener('ChannelDtmfReceived', handler);
+// or remove all event listeners for a particular event type
+channel.removeAllListeners('ChannelDtmfReceived');
+```
+
+However, certain resource instance events can be managed for you after a final event has been received for that resource to minimize possible memory leaks. This requires that the instance be explicitely set to be managed by the client library and is only supported for certain resource types.
+
+Currently, Channels, Bridges, LiveRecordings, and Playbacks can be managed for you. Channels behave slightly differently from the others as they can only be managed within a given Stasis application. Once a StasisEnd event is received for the channel, all event listeners for that channel will be unregistered. If your application requires that you subscribe to all events for a given channel and you expect to receive events after the channel leaves Stasis, the client cannot manage the resource for you and you should not set that instance as managed.
+
+It is important to note that event listeners for resource instances can only be cleaned up once a given resource has been successfully created and subsequently destroyed in Asterisk. This means different things for different resource types. For Bridges, the bridge has to be both created, and subsequently destroyed before event listeners can be cleaned up by the client. For Channels, the channel has to enter Stasis and leave Stasis. For LiveRecordings and Playbacks, the instance has to be started and then finish. If errors occur during creation of the resource, or if a channel never enters Stasis in the first place, the client library cannot clean up event listeners for you.
+
+The following shows an example of setting an instance as managed by the library:
+
+```javascript
+ari.on('StasisStart', function (event, channel) {
+    channel.manageInstance();
+
+    // the ChannelDtmfReceived listener will be unregistered once a 'StasisEnd' event is received for the channel
+    channel.on('ChannelDtmfReceived', function (event, channel) {
+        // use event.digit to look up DTMF
+    });
+});
+```
+
+The following events trigger cleanup of all event listeners for a resource instance if the instance is set to be managed by the client:
+
+- Channels: 'StasisEnd'
+- Bridges: 'BridgeDestroyed'
+- LiveRecordings: 'RecordingFailed', 'RecordingFinished'
+- Playbacks: 'PlaybackFinished'
+
+#### Supported Events
 
 The following events are defined:
 
-#### APILoadError
+##### APILoadError
 
 ARI client failed to load.
 
@@ -187,7 +272,7 @@ function (err) {}
 
 {{{events}}}
 
-#### WebSocketReconnecting
+##### WebSocketReconnecting
 
 WebSocket has disconnected, and the client is attempting to reconnect.
 
@@ -195,7 +280,7 @@ WebSocket has disconnected, and the client is attempting to reconnect.
 function (err) {}
 ```
 
-#### WebSocketConnected
+##### WebSocketConnected
 
 WebSocket has connected. Note that normally this event is emitted prior to resolving the `connect()` promise, so you probably will not get an even on the initial connection.
 
@@ -203,7 +288,7 @@ WebSocket has connected. Note that normally this event is emitted prior to resol
 function () {}
 ```
 
-#### WebSocketMaxRetries
+##### WebSocketMaxRetries
 
 Client will no longer attempt to reconnect to the WebSocket for the current application(s).
 
