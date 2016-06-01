@@ -140,6 +140,68 @@
       ]
     },
     {
+      "path": "/channels/create",
+      "description": "Create a channel and place it in a Stasis app, but do not dial the channel yet.",
+      "operations": [
+        {
+          "httpMethod": "POST",
+          "summary": "Create channel.",
+          "nickname": "create",
+          "responseClass": "Channel",
+          "parameters": [
+            {
+              "name": "endpoint",
+              "description": "Endpoint for channel communication",
+              "paramType": "query",
+              "required": true,
+              "allowMultiple": false,
+              "dataType": "string"
+            },
+            {
+              "name": "app",
+              "description": "Stasis Application to place channel into",
+              "paramType": "query",
+              "required": true,
+              "allowMultiple": false,
+              "dataType": "string"
+            },
+            {
+              "name": "appArgs",
+              "description": "The application arguments to pass to the Stasis application provided by 'app'. Mutually exclusive with 'context', 'extension', 'priority', and 'label'.",
+              "paramType": "query",
+              "required": false,
+              "allowMultiple": false,
+              "dataType": "string"
+            },
+            {
+              "name": "channelId",
+              "description": "The unique id to assign the channel on creation.",
+              "paramType": "query",
+              "required": false,
+              "allowMultiple": false,
+              "dataType": "string"
+            },
+            {
+              "name": "otherChannelId",
+              "description": "The unique id to assign the second channel when using local channels.",
+              "paramType": "query",
+              "required": false,
+              "allowMultiple": false,
+              "dataType": "string"
+            },
+            {
+              "name": "originator",
+              "description": "Unique ID of the calling channel",
+              "paramType": "query",
+              "required": false,
+              "allowMultiple": false,
+              "dataType": "string"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "path": "/channels/{channelId}",
       "description": "Active channel",
       "operations": [
@@ -910,10 +972,10 @@
             },
             {
               "name": "media",
-              "description": "Media's URI to play.",
+              "description": "Media URIs to play.",
               "paramType": "query",
               "required": true,
-              "allowMultiple": false,
+              "allowMultiple": true,
               "dataType": "string"
             },
             {
@@ -926,7 +988,7 @@
             },
             {
               "name": "offsetms",
-              "description": "Number of media to skip before playing.",
+              "description": "Number of milliseconds to skip before playing. Only applies to the first URI if multiple media URIs are specified.",
               "paramType": "query",
               "required": false,
               "allowMultiple": false,
@@ -992,10 +1054,10 @@
             },
             {
               "name": "media",
-              "description": "Media's URI to play.",
+              "description": "Media URIs to play.",
               "paramType": "query",
               "required": true,
-              "allowMultiple": false,
+              "allowMultiple": true,
               "dataType": "string"
             },
             {
@@ -1008,7 +1070,7 @@
             },
             {
               "name": "offsetms",
-              "description": "Number of media to skip before playing.",
+              "description": "Number of milliseconds to skip before playing. Only applies to the first URI if multiple media URIs are specified.",
               "paramType": "query",
               "required": false,
               "allowMultiple": false,
@@ -1435,6 +1497,59 @@
             {
               "code": 404,
               "reason": "Channel not found"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/channels/{channelId}/dial",
+      "description": "Dial a channel",
+      "operations": [
+        {
+          "httpMethod": "POST",
+          "summary": "Dial a created channel.",
+          "nickname": "dial",
+          "responseClass": "void",
+          "parameters": [
+            {
+              "name": "channelId",
+              "description": "Channel's id",
+              "paramType": "path",
+              "required": true,
+              "allowMultiple": false,
+              "dataType": "string"
+            },
+            {
+              "name": "caller",
+              "description": "Channel ID of caller",
+              "paramType": "query",
+              "required": false,
+              "allowMultiple": false,
+              "dataType": "string"
+            },
+            {
+              "name": "timeout",
+              "description": "Dial timeout",
+              "paramType": "query",
+              "required": false,
+              "allowMultiple": false,
+              "dataType": "int",
+              "defaultValue": 0,
+              "allowableValues": {
+                "valueType": "RANGE",
+                "min": 0
+              }
+            }
+          ],
+          "errorResponses": [
+            {
+              "code": 404,
+              "reason": "Channel cannot be found."
+            },
+            {
+              "code": 409,
+              "reason": "Channel cannot be dialed."
             }
           ]
         }
