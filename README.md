@@ -824,8 +824,8 @@ ari.bridges.play({
 ###### Available Parameters
 - bridgeId (string) - Bridge's id
 - lang (string) - For sounds, selects language for sound.
-- media (string) - Media's URI to play.
-- offsetms (int) - Number of media to skip before playing.
+- media (string) - Media URIs to play.
+- offsetms (int) - Number of milliseconds to skip before playing. Only applies to the first URI if multiple media URIs are specified.
 - playbackId (string) - Playback Id.
 - skipms (int) - Number of milliseconds to skip for forward/reverse operations.
 
@@ -856,8 +856,8 @@ ari.bridges.playWithId({
 ###### Available Parameters
 - bridgeId (string) - Bridge's id
 - lang (string) - For sounds, selects language for sound.
-- media (string) - Media's URI to play.
-- offsetms (int) - Number of media to skip before playing.
+- media (string) - Media URIs to play.
+- offsetms (int) - Number of milliseconds to skip before playing. Only applies to the first URI if multiple media URIs are specified.
 - playbackId (string) - Playback ID.
 - skipms (int) - Number of milliseconds to skip for forward/reverse operations.
 
@@ -1028,6 +1028,64 @@ ari.channels.continueInDialplan({
 - extension (string) - The extension to continue to.
 - label (string) - The label to continue to - will supersede 'priority' if both are provided.
 - priority (int) - The priority to continue to.
+
+##### create
+
+Create channel.
+
+Callbacks:
+
+```javascript
+ari.channels.create(
+  {app: val, endpoint: val},
+  function (err, channel) {}
+);
+```
+
+Promises:
+
+```javascript
+ari.channels.create({
+    app: val,
+    endpoint: val
+})
+  .then(function (channel) {})
+  .catch(function (err) {});
+```
+###### Available Parameters
+- app (string) - Stasis Application to place channel into
+- appArgs (string) - The application arguments to pass to the Stasis application provided by 'app'. Mutually exclusive with 'context', 'extension', 'priority', and 'label'.
+- channelId (string) - The unique id to assign the channel on creation.
+- endpoint (string) - Endpoint for channel communication
+- originator (string) - Unique ID of the calling channel
+- otherChannelId (string) - The unique id to assign the second channel when using local channels.
+
+##### dial
+
+Dial a created channel.
+
+Callbacks:
+
+```javascript
+ari.channels.dial(
+  {channelId: val},
+  function (err) {}
+);
+```
+
+Promises:
+
+```javascript
+ari.channels.dial({
+    channelId: val
+})
+  .then(function () {})
+  .catch(function (err) {});
+```
+###### Available Parameters
+- caller (string) - Channel ID of caller
+- channelId (string) - Channel's id
+- timeout (int) - Dial timeout
 
 ##### get
 
@@ -1278,8 +1336,8 @@ ari.channels.play({
 ###### Available Parameters
 - channelId (string) - Channel's id
 - lang (string) - For sounds, selects language for sound.
-- media (string) - Media's URI to play.
-- offsetms (int) - Number of media to skip before playing.
+- media (string) - Media URIs to play.
+- offsetms (int) - Number of milliseconds to skip before playing. Only applies to the first URI if multiple media URIs are specified.
 - playbackId (string) - Playback ID.
 - skipms (int) - Number of milliseconds to skip for forward/reverse operations.
 
@@ -1310,8 +1368,8 @@ ari.channels.playWithId({
 ###### Available Parameters
 - channelId (string) - Channel's id
 - lang (string) - For sounds, selects language for sound.
-- media (string) - Media's URI to play.
-- offsetms (int) - Number of media to skip before playing.
+- media (string) - Media URIs to play.
+- offsetms (int) - Number of milliseconds to skip before playing. Only applies to the first URI if multiple media URIs are specified.
 - playbackId (string) - Playback ID.
 - skipms (int) - Number of milliseconds to skip for forward/reverse operations.
 
@@ -2229,6 +2287,31 @@ ari.recordings.getStored({
 ###### Available Parameters
 - recordingName (string) - The name of the recording
 
+##### getStoredFile
+
+Get the file associated with the stored recording.
+
+Callbacks:
+
+```javascript
+ari.recordings.getStoredFile(
+  {recordingName: val},
+  function (err, binary) {}
+);
+```
+
+Promises:
+
+```javascript
+ari.recordings.getStoredFile({
+    recordingName: val
+})
+  .then(function (binary) {})
+  .catch(function (err) {});
+```
+###### Available Parameters
+- recordingName (string) - The name of the recording
+
 ##### listStored
 
 List recordings that are complete.
@@ -2881,6 +2964,19 @@ function (event, endpoint) {}
 
 ##### Resource Specific Emitters
 Endpoint
+
+#### PlaybackContinuing
+
+Event showing the continuation of a media playback operation from one media URI to the next in the list.
+
+```javascript
+function (event, playback) {}
+```
+##### Available Event Properties
+- playback (Playback) - Playback control object
+
+##### Resource Specific Emitters
+Playback
 
 #### PlaybackFinished
 
