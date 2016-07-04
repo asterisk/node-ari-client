@@ -209,7 +209,7 @@ describe('client', function () {
       if (err) { return done(err); }
 
       function doItAgain() {
-        if (reconnectCount-- == 0) {
+        if (reconnectCount-- === 0) {
           done();
           return;
         }

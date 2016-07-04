@@ -1,0 +1,19 @@
+# EditorConfig is awesome: http://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# Unix-style newlines with a newline ending every file
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+max_line_length = 80
+indent_style = space
+
+[*.{js,scss,less,css,jade,json,html,jsx,md}]
+indent_size = 2
+
+[.git/COMMIT_EDITMSG]
+max_line_length = 72
