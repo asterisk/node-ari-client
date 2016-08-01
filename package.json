@@ -27,7 +27,7 @@
     "node-uuid": "^1.4.1",
     "swagger-client": "^2.0.26",
     "underscore": "^1.6.0",
-    "ws": "^0.4.31"
+    "ws": "^1.1.1"
   },
   "engines": {
     "node": ">=0.10.0"
