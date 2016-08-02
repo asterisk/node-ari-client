@@ -1,4 +1,6 @@
-# About
+![](https://travis-ci.org/asterisk/node-ari-client.svg?branch=master)
+
+# node-ari-client
 
 This module contains the Node.js client library for the Asterisk REST Interface.
 It builds upon the swagger-js library, providing an improved, Asterisk-specific
