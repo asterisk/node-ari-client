@@ -1,6 +1,6 @@
 {
   "name": "ari-client",
-  "version": "0.6.0",
+  "version": "1.0.0",
   "description": "JavaScript client for Asterisk REST Interface.",
   "homepage": "https://github.com/asterisk/node-ari-client",
   "keywords": [
