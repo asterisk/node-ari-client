@@ -1,4 +1,4 @@
-![](https://travis-ci.org/asterisk/node-ari-client.svg?branch=master)
+[![build status][build_image]][build]
 
 # node-ari-client
 
@@ -3287,3 +3287,6 @@ grunt jsdoc
 # License
 
 Apache, Version 2.0. Copyright (c) 2014, Digium, Inc. All rights reserved.
+
+[build]: https://travis-ci.org/asterisk/node-ari-client
+[build_image]: https://travis-ci.org/asterisk/node-ari-client.svg?branch=master
