@@ -15,9 +15,6 @@
 
 'use strict';
 
-/*global require:false*/
-/*jshint globalstrict: true*/
-
 var client = require('ari-client');
 
 client.connect('http://ari.js:8088', 'user', 'secret',

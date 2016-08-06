@@ -9,9 +9,10 @@
   ],
   "main": "./lib/client.js",
   "scripts": {
-    "test": "mocha --reporter spec",
+    "test": "npm run lint && mocha --reporter spec",
     "cover": "istanbul cover --report html _mocha",
-    "check-coverage": "npm run cover && istanbul check-coverage --lines 75 --statements 75 --functions 75 --branches 70"
+    "check-coverage": "npm run cover && istanbul check-coverage --lines 75 --statements 75 --functions 75 --branches 70",
+    "lint": "jshint . --verbose"
   },
   "repository": {
     "type": "git",
@@ -37,11 +38,11 @@
   "devDependencies": {
     "async": "^0.8.0",
     "grunt": "^0.4.4",
-    "grunt-contrib-jshint": "^0.10.0",
     "grunt-jsdoc": "^0.5.4",
     "grunt-mocha-test": "^0.10.0",
     "hock": "^0.2.5",
     "istanbul": "^0.4.4",
+    "jshint": "^2.9.2",
     "mocha": "^1.17.1",
     "moment": "^2.6.0",
     "mustache": "^0.8.1",

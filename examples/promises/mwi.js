@@ -15,9 +15,6 @@
 
 'use strict';
 
-/*global require:false*/
-/*jshint globalstrict: true*/
-
 var client = require('ari-client');
 var Promise = require('bluebird');
 var util = require('util');

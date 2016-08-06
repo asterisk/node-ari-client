@@ -9,19 +9,10 @@
 
 'use strict';
 
-/*global describe:false*/
-/*global before:false*/
-/*global after:false*/
-/*global it:false*/
-/*global require:false*/
-/*jshint globalstrict: true*/
-
 var util = require('util');
 var assert = require('assert');
-
 var _ = require('underscore');
 var Promise = require('bluebird');
-
 var client = require('../lib/client.js');
 var helpers = require('./helpers.js');
 
@@ -209,7 +200,7 @@ describe('client', function () {
       if (err) { return done(err); }
 
       function doItAgain() {
-        if (reconnectCount-- == 0) {
+        if (reconnectCount-- === 0) {
           done();
           return;
         }

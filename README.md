@@ -3240,7 +3240,7 @@ client.connect('http://localhost:8088', 'user', 'secret')
 To run the mocha tests for ari-client, run the following:
 
 ```bash
-grunt mochaTest
+npm test
 ```
 
 The tests run against a mocked ARI REST endpoint and websocket server.
@@ -3257,7 +3257,7 @@ npm link
 Then run the following to run jshint and mocha tests:
 
 ```bash
-grunt
+npm test
 ```
 
 jshint will enforce a minimal style guide. It is also a good idea to create unit tests when adding new features to ari-client.

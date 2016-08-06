@@ -9,12 +9,6 @@
 
 'use strict';
 
-/*global require:false*/
-/*global module:false*/
-/*global console:false*/
-/*global __dirname:false*/
-/*jshint globalstrict: true*/
-
 var hock = require('hock');
 var fs = require('fs');
 var util = require('util');
