@@ -13,10 +13,6 @@
 
 module.exports = function(grunt) {
 
-  // threshold for failing coverage
-  var coverageThreshold = 75;
-  var branchThreshold = 70;
-
   // Project configuration.
   grunt.initConfig({
     // Task configuration.
@@ -67,20 +63,6 @@ module.exports = function(grunt) {
           destination: 'doc'
         }
       }
-    },
-
-    'mocha_istanbul': {
-      coverage: {
-        src: 'test',
-        options: {
-          check: {
-            lines: coverageThreshold,
-            statements: coverageThreshold,
-            branches: branchThreshold,
-            functions: coverageThreshold
-          }
-        }
-      }
     }
   });
 
@@ -88,13 +70,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-mocha-test');
   grunt.loadNpmTasks('grunt-jsdoc');
-  grunt.loadNpmTasks('grunt-mocha-istanbul');
 
   // Default task.
   grunt.registerTask('default', ['jshint', 'mochaTest']);
-
-  // Custom tasks
-  grunt.registerTask('coverage', ['mocha_istanbul:coverage']);
 
   grunt.registerTask(
       'gendocs',
