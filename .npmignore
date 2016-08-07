@@ -4,3 +4,4 @@ examples
 test
 Gruntfile.js
 .jshint
+*.log

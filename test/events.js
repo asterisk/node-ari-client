@@ -10,14 +10,6 @@
 
 'use strict';
 
-/*global describe:false*/
-/*global before:false*/
-/*global after:false*/
-/*global it:false*/
-/*global setTimeout:false*/
-/*global require:false*/
-/*jshint globalstrict: true*/
-
 var client = require('../lib/client.js');
 var _ = require('underscore');
 var util = require('util');

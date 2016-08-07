@@ -15,11 +15,6 @@
 
 'use strict';
 
-/*global require:false*/
-/*global process:false*/
-/*global console:false*/
-/*jshint globalstrict: true*/
-
 var client = require('ari-client');
 var util = require('util');
 

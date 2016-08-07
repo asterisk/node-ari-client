@@ -9,20 +9,12 @@
  *  @author Samuel Fortier-Galarneau <sgalarneau@digium.com>
  */
 
-/*global module:false*/
+'use strict';
 
 module.exports = function(grunt) {
 
   // Project configuration.
   grunt.initConfig({
-    // Task configuration.
-    jshint: {
-      options: {
-        jshintrc: true
-      },
-      all: ['Gruntfile.js', 'lib/**/*.js', 'test/**/*.js', 'examples/**/*.js']
-    },
-
     mochaTest: {
       test: {
         options: {
@@ -67,12 +59,11 @@ module.exports = function(grunt) {
   });
 
   // These plugins provide necessary tasks.
-  grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-mocha-test');
   grunt.loadNpmTasks('grunt-jsdoc');
 
   // Default task.
-  grunt.registerTask('default', ['jshint', 'mochaTest']);
+  grunt.registerTask('default', ['mochaTest']);
 
   grunt.registerTask(
       'gendocs',
