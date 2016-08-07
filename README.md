@@ -3265,7 +3265,7 @@ jshint will enforce a minimal style guide. It is also a good idea to create unit
 To generate a test coverage report run the following:
 
 ```bash
-$ grunt coverage
+npm run check-coverage
 ```
 
 This will also ensure a coverage threshold is met by the tests.
