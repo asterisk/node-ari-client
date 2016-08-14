@@ -15,17 +15,6 @@ module.exports = function(grunt) {
 
   // Project configuration.
   grunt.initConfig({
-    mochaTest: {
-      test: {
-        options: {
-          mocha: require('mocha'),
-          reporter: 'spec',
-          timeout: 2000
-        },
-        src: ['test/*.js']
-      }
-    },
-
     gendocs: {
       options: {
         baseUrl: 'http://ari.js:8088',
@@ -59,11 +48,10 @@ module.exports = function(grunt) {
   });
 
   // These plugins provide necessary tasks.
-  grunt.loadNpmTasks('grunt-mocha-test');
   grunt.loadNpmTasks('grunt-jsdoc');
 
   // Default task.
-  grunt.registerTask('default', ['mochaTest']);
+  grunt.registerTask('default', ['gendocs']);
 
   grunt.registerTask(
       'gendocs',
