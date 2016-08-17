@@ -13,6 +13,8 @@
 var client = require('../lib/client.js');
 var _ = require('underscore');
 var util = require('util');
+var portfinder = require('portfinder');
+var http = require('http');
 var assert = require('assert');
 var helpers = require('./helpers.js');
 
@@ -26,27 +28,30 @@ describe('events', function () {
   var wsserver = null;
 
   before(function (done) {
-    helpers.mockClient(function (err, hockServer, port) {
-      server = hockServer;
-      url = util.format(url, port);
-      client.connect(url, user, pass, clientLoaded);
+    portfinder.getPort(function (err, port) {
+      assert.ifError(err);
 
-      function clientLoaded (err, newClient) {
-        ari = newClient;
-        wsserver = helpers.createWebSocketServer(server._server);
-        ari.start('unittests');
+      server = helpers.buildMockServer(port);
+      server.realServer = http.createServer(server.handler);
+      server.realServer.listen(port, function () {
+        url = util.format(url, port);
+        client.connect(url, user, pass, function (err, connectedClient) {
+          ari = connectedClient;
+          wsserver = helpers.createWebSocketServer(server.realServer);
+          ari.start('unittests');
 
-        // ensure socket is connected before tests start
-        setTimeout(function () {
-          done();
-        }, 1000);
-      }
+          // ensure socket is connected before tests start
+          setTimeout(function () {
+            done();
+          }, 1000);
+        });
+      });
     });
   });
 
   after(function (done) {
     ari.stop();
-    server.close(done);
+    server.realServer.close(done);
   });
 
   describe('#client', function () {
