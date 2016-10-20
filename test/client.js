@@ -96,6 +96,7 @@ var operations = {
   recordings: [
     'listStored',
     'getStored',
+    'getStoredFile',
     'deleteStored',
     'getLive',
     'cancel',
