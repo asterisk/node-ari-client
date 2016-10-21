@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.1.0 - 2016-10-21
+
+- Add parsing logic to handle 'binary' responseType from Asterisk.
+This allows `getStoredFile()` to properly pass back a Node.js `Buffer`
+object from this method. Thanks @mpotra!
+
+## 1.0.2 - 2016-09-15
+
+- Use wss protocol when the baseUrl passed in is https. Keep in mind
+that Asterisk still does not support wss without a patch. Thanks
+@danjenkins!
+
 ## 1.0.0 - 2016-08-02
 
 #### Backward-incompatible changes
