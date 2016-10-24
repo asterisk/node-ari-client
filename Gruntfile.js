@@ -257,14 +257,14 @@ module.exports = function(grunt) {
 
         if (availableProps.length > 0) {
           events += util.format(
-            '##### Available Event Properties\n%s\n\n',
+            '###### Available Event Properties\n%s\n\n',
             availableProps.join('\n')
           );
         }
 
         if (instances.length > 0) {
           events += util.format(
-            '##### Resource Specific Emitters\n%s\n\n',
+            '###### Resource Specific Emitters\n%s\n\n',
             instances.join('\n')
           );
         }

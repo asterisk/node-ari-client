@@ -2511,11 +2511,97 @@ ari.sounds.list()
 
 ### Events
 
-Event listeners can be registered on the client as well as on resource instances. Note that resource instance listeners are tied to the instance while client listeners receive all events of a given type regardless of which resource the event is for.
+Event listeners can be registered on the client as well as on resource instances.
+
+#### Client Events
+
+Client events are received for all events of a given type regardless of which resource the event is for.
+
+```javascript
+ari.on('StasisStart', function (event, channelInstance) {
+    // will be called for all channels that enter the Stasis application
+});
+```
+
+#### Resource Instance Events
+
+Resource instance events are only received for the given type and resource.
+
+Callbacks:
+
+```javascript
+var channel = ari.Channel();
+channel.on('StasisStart', function (event, channelInstance) {
+    // will only be called when the channel above enters the Stasis application
+});
+
+channel.originate(
+  {endpoint: 'PJSIP/endpoint', app: 'applicationName'},
+  function (err, channelInstance) {}
+);
+```
+
+Promises:
+
+```javascript
+var channel = ari.Channel();
+channel.on('StasisStart', function (event, channelInstance) {
+    // will only be called when the channel above enters the Stasis application
+});
+
+channel.originate({endpoint: 'PJSIP/endpoint', app: 'applicationName'})
+  .then(function (channelInstance) {})
+  .catch(function (err) {});
+```
+
+#### Managing Events
+
+When using events, it is important to note that the callbacks you provide to handle events cannot be garbage collected until they are unregistered as shown below.
+
+At the client level:
+
+```javascript
+var handler = function (event, channel) {};
+
+// receive all 'ChannelDtmfReceived' events
+ari.on('ChannelDtmfReceived', handler);
+
+// at some point in your application, remove the event listener to ensure the handler function can be garbage collected
+ari.removeListener('ChannelDtmfReceived', handler);
+// or remove all event listeners for a particular event type
+ari.removeAllListeners('ChannelDtmfReceived');
+```
+
+At the instance level:
+
+```javascript
+var channel = ari.Channel();
+var handler = function (event, channel) {};
+
+// receive all 'ChannelDtmfReceived' events for this channel
+channel.on('ChannelDtmfReceived', handler);
+
+// at some point in your application, remove the event listener to ensure the handler function can be garbage collected
+channel.removeListener('ChannelDtmfReceived', handler);
+// or remove all event listeners for a particular event type
+channel.removeAllListeners('ChannelDtmfReceived');
+```
+
+For events that are only expected to fire once, `once` can be used to register an event listener that will automatically be unregistered once the event fires as shown below:
+
+```javascript
+var playback = ari.Playback();
+var handler = function (event, playback) {};
+
+// receive 'PlaybackFinished' events for this playback
+playback.once('PlaybackFinished', handler);
+```
+
+#### Supported Events
 
 The following events are defined:
 
-#### APILoadError
+##### APILoadError
 
 ARI client failed to load.
 
@@ -2523,7 +2609,7 @@ ARI client failed to load.
 function (err) {}
 ```
 
-#### ApplicationReplaced
+##### ApplicationReplaced
 
 Notification that another WebSocket has taken over for an application.
 
@@ -2532,14 +2618,14 @@ An application may only be subscribed to by a single WebSocket at a time. If mul
 ```javascript
 function (event) {}
 ```
-#### BridgeAttendedTransfer
+##### BridgeAttendedTransfer
 
 Notification that an attended transfer has occurred.
 
 ```javascript
 function (event, {destination_link_first_leg: val, destination_link_second_leg: val, destination_threeway_bridge: val, destination_threeway_channel: val, replace_channel: val, transfer_target: val, transferee: val, transferer_first_leg: val, transferer_first_leg_bridge: val, transferer_second_leg: val, transferer_second_leg_bridge: val}) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - destination_application (string) - Application that has been transferred into
 - destination_bridge (string) - Bridge that survived the merge result
 - destination_link_first_leg (Channel) - First leg of a link transfer result
@@ -2557,18 +2643,18 @@ function (event, {destination_link_first_leg: val, destination_link_second_leg: 
 - transferer_second_leg (Channel) - Second leg of the transferer
 - transferer_second_leg_bridge (Bridge) - Bridge the transferer second leg is in
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Channel
 Bridge
 
-#### BridgeBlindTransfer
+##### BridgeBlindTransfer
 
 Notification that a blind transfer has occurred.
 
 ```javascript
 function (event, {bridge: val, channel: val, replace_channel: val, transferee: val}) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - bridge (Bridge) - The bridge being transferred
 - channel (Channel) - The channel performing the blind transfer
 - context (string) - The context transferred to
@@ -2578,122 +2664,122 @@ function (event, {bridge: val, channel: val, replace_channel: val, transferee: v
 - result (string) - The result of the transfer attempt
 - transferee (Channel) - The channel that is being transferred
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Bridge
 Channel
 
-#### BridgeCreated
+##### BridgeCreated
 
 Notification that a bridge has been created.
 
 ```javascript
 function (event, bridge) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - bridge (Bridge) - undefined
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Bridge
 
-#### BridgeDestroyed
+##### BridgeDestroyed
 
 Notification that a bridge has been destroyed.
 
 ```javascript
 function (event, bridge) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - bridge (Bridge) - undefined
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Bridge
 
-#### BridgeMerged
+##### BridgeMerged
 
 Notification that one bridge has merged into another.
 
 ```javascript
 function (event, {bridge: val, bridge_from: val}) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - bridge (Bridge) - undefined
 - bridge_from (Bridge) - undefined
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Bridge
 
-#### ChannelCallerId
+##### ChannelCallerId
 
 Channel changed Caller ID.
 
 ```javascript
 function (event, channel) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - caller_presentation (int) - The integer representation of the Caller Presentation value.
 - caller_presentation_txt (string) - The text representation of the Caller Presentation value.
 - channel (Channel) - The channel that changed Caller ID.
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Channel
 
-#### ChannelConnectedLine
+##### ChannelConnectedLine
 
 Channel changed Connected Line.
 
 ```javascript
 function (event, channel) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - channel (Channel) - The channel whose connected line has changed.
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Channel
 
-#### ChannelCreated
+##### ChannelCreated
 
 Notification that a channel has been created.
 
 ```javascript
 function (event, channel) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - channel (Channel) - undefined
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Channel
 
-#### ChannelDestroyed
+##### ChannelDestroyed
 
 Notification that a channel has been destroyed.
 
 ```javascript
 function (event, channel) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - cause (int) - Integer representation of the cause of the hangup
 - cause_txt (string) - Text representation of the cause of the hangup
 - channel (Channel) - undefined
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Channel
 
-#### ChannelDialplan
+##### ChannelDialplan
 
 Channel changed location in the dialplan.
 
 ```javascript
 function (event, channel) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - channel (Channel) - The channel that changed dialplan location.
 - dialplan_app (string) - The application about to be executed.
 - dialplan_app_data (string) - The data to be passed to the application.
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Channel
 
-#### ChannelDtmfReceived
+##### ChannelDtmfReceived
 
 DTMF received on a channel.
 
@@ -2702,210 +2788,210 @@ This event is sent when the DTMF ends. There is no notification about the start 
 ```javascript
 function (event, channel) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - channel (Channel) - The channel on which DTMF was received
 - digit (string) - DTMF digit received (0-9, A-E, # or *)
 - duration_ms (int) - Number of milliseconds DTMF was received
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Channel
 
-#### ChannelEnteredBridge
+##### ChannelEnteredBridge
 
 Notification that a channel has entered a bridge.
 
 ```javascript
 function (event, {bridge: val, channel: val}) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - bridge (Bridge) - undefined
 - channel (Channel) - undefined
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Bridge
 Channel
 
-#### ChannelHangupRequest
+##### ChannelHangupRequest
 
 A hangup was requested on the channel.
 
 ```javascript
 function (event, channel) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - cause (int) - Integer representation of the cause of the hangup.
 - channel (Channel) - The channel on which the hangup was requested.
 - soft (boolean) - Whether the hangup request was a soft hangup request.
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Channel
 
-#### ChannelHold
+##### ChannelHold
 
 A channel initiated a media hold.
 
 ```javascript
 function (event, channel) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - channel (Channel) - The channel that initiated the hold event.
 - musicclass (string) - The music on hold class that the initiator requested.
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Channel
 
-#### ChannelLeftBridge
+##### ChannelLeftBridge
 
 Notification that a channel has left a bridge.
 
 ```javascript
 function (event, {bridge: val, channel: val}) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - bridge (Bridge) - undefined
 - channel (Channel) - undefined
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Bridge
 Channel
 
-#### ChannelStateChange
+##### ChannelStateChange
 
 Notification of a channel's state change.
 
 ```javascript
 function (event, channel) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - channel (Channel) - undefined
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Channel
 
-#### ChannelTalkingFinished
+##### ChannelTalkingFinished
 
 Talking is no longer detected on the channel.
 
 ```javascript
 function (event, channel) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - channel (Channel) - The channel on which talking completed.
 - duration (int) - The length of time, in milliseconds, that talking was detected on the channel
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Channel
 
-#### ChannelTalkingStarted
+##### ChannelTalkingStarted
 
 Talking was detected on the channel.
 
 ```javascript
 function (event, channel) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - channel (Channel) - The channel on which talking started.
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Channel
 
-#### ChannelUnhold
+##### ChannelUnhold
 
 A channel initiated a media unhold.
 
 ```javascript
 function (event, channel) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - channel (Channel) - The channel that initiated the unhold event.
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Channel
 
-#### ChannelUserevent
+##### ChannelUserevent
 
 User-generated event with additional user-defined fields in the object.
 
 ```javascript
 function (event, {bridge: val, channel: val, endpoint: val}) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - bridge (Bridge) - A bridge that is signaled with the user event.
 - channel (Channel) - A channel that is signaled with the user event.
 - endpoint (Endpoint) - A endpoint that is signaled with the user event.
 - eventname (string) - The name of the user event.
 - userevent (object) - Custom Userevent data
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Bridge
 Channel
 Endpoint
 
-#### ChannelVarset
+##### ChannelVarset
 
 Channel variable changed.
 
 ```javascript
 function (event, channel) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - channel (Channel) - The channel on which the variable was set.
 
 If missing, the variable is a global variable.
 - value (string) - The new value of the variable.
 - variable (string) - The variable that changed.
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Channel
 
-#### ContactInfo
+##### ContactInfo
 
 Detailed information about a contact on an endpoint.
 
 ```javascript
 function (event) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - aor (string) - The Address of Record this contact belongs to.
 - contact_status (string) - The current status of the contact.
 - roundtrip_usec (string) - Current round trip time, in microseconds, for the contact.
 - uri (string) - The location of the contact.
 
-#### ContactStatusChange
+##### ContactStatusChange
 
 The state of a contact on an endpoint has changed.
 
 ```javascript
 function (event, endpoint) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - contact_info (ContactInfo) - undefined
 - endpoint (Endpoint) - undefined
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Endpoint
 
-#### DeviceStateChanged
+##### DeviceStateChanged
 
 Notification that a device state has changed.
 
 ```javascript
 function (event, device_state) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - device_state (DeviceState) - Device state object
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 DeviceState
 
-#### Dial
+##### Dial
 
 Dialing state has changed.
 
 ```javascript
 function (event, {caller: val, forwarded: val, peer: val}) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - caller (Channel) - The calling channel.
 - dialstatus (string) - Current status of the dialing attempt to the peer.
 - dialstring (string) - The dial string for calling the peer channel.
@@ -2913,183 +2999,183 @@ function (event, {caller: val, forwarded: val, peer: val}) {}
 - forwarded (Channel) - Channel that the caller has been forwarded to.
 - peer (Channel) - The dialed channel.
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Channel
 
-#### EndpointStateChange
+##### EndpointStateChange
 
 Endpoint state changed.
 
 ```javascript
 function (event, endpoint) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - endpoint (Endpoint) - undefined
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Endpoint
 
-#### MissingParams
+##### MissingParams
 
 Error event sent when required params are missing.
 
 ```javascript
 function (event) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - params (List[string]) - A list of the missing parameters
 
-#### Peer
+##### Peer
 
 Detailed information about a remote peer that communicates with Asterisk.
 
 ```javascript
 function (event) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - address (string) - The IP address of the peer.
 - cause (string) - An optional reason associated with the change in peer_status.
 - peer_status (string) - The current state of the peer. Note that the values of the status are dependent on the underlying peer technology.
 - port (string) - The port of the peer.
 - time (string) - The last known time the peer was contacted.
 
-#### PeerStatusChange
+##### PeerStatusChange
 
 The state of a peer associated with an endpoint has changed.
 
 ```javascript
 function (event, endpoint) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - endpoint (Endpoint) - undefined
 - peer (Peer) - undefined
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Endpoint
 
-#### PlaybackContinuing
+##### PlaybackContinuing
 
 Event showing the continuation of a media playback operation from one media URI to the next in the list.
 
 ```javascript
 function (event, playback) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - playback (Playback) - Playback control object
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Playback
 
-#### PlaybackFinished
+##### PlaybackFinished
 
 Event showing the completion of a media playback operation.
 
 ```javascript
 function (event, playback) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - playback (Playback) - Playback control object
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Playback
 
-#### PlaybackStarted
+##### PlaybackStarted
 
 Event showing the start of a media playback operation.
 
 ```javascript
 function (event, playback) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - playback (Playback) - Playback control object
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Playback
 
-#### RecordingFailed
+##### RecordingFailed
 
 Event showing failure of a recording operation.
 
 ```javascript
 function (event, recording) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - recording (LiveRecording) - Recording control object
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 LiveRecording
 
-#### RecordingFinished
+##### RecordingFinished
 
 Event showing the completion of a recording operation.
 
 ```javascript
 function (event, recording) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - recording (LiveRecording) - Recording control object
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 LiveRecording
 
-#### RecordingStarted
+##### RecordingStarted
 
 Event showing the start of a recording operation.
 
 ```javascript
 function (event, recording) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - recording (LiveRecording) - Recording control object
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 LiveRecording
 
-#### StasisEnd
+##### StasisEnd
 
 Notification that a channel has left a Stasis application.
 
 ```javascript
 function (event, channel) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - channel (Channel) - undefined
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Channel
 
-#### StasisStart
+##### StasisStart
 
 Notification that a channel has entered a Stasis application.
 
 ```javascript
 function (event, {channel: val, replace_channel: val}) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - args (List[string]) - Arguments to the application
 - channel (Channel) - undefined
 - replace_channel (Channel) - undefined
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Channel
 
-#### TextMessageReceived
+##### TextMessageReceived
 
 A text message was received from an endpoint.
 
 ```javascript
 function (event, endpoint) {}
 ```
-##### Available Event Properties
+###### Available Event Properties
 - endpoint (Endpoint) - undefined
 - message (TextMessage) - undefined
 
-##### Resource Specific Emitters
+###### Resource Specific Emitters
 Endpoint
 
 
 
-#### WebSocketReconnecting
+##### WebSocketReconnecting
 
 WebSocket has disconnected, and the client is attempting to reconnect.
 
@@ -3097,7 +3183,7 @@ WebSocket has disconnected, and the client is attempting to reconnect.
 function (err) {}
 ```
 
-#### WebSocketConnected
+##### WebSocketConnected
 
 WebSocket has connected. Note that normally this event is emitted prior to resolving the `connect()` promise, so you probably will not get an even on the initial connection.
 
@@ -3105,7 +3191,7 @@ WebSocket has connected. Note that normally this event is emitted prior to resol
 function () {}
 ```
 
-#### WebSocketMaxRetries
+##### WebSocketMaxRetries
 
 Client will no longer attempt to reconnect to the WebSocket for the current application(s).
 
