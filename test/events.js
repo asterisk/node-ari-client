@@ -94,8 +94,11 @@ describe('events', function () {
       assert(_.isFunction(bridge.on), 'on exists');
       assert(_.isFunction(bridge.addListener), 'addListener exists');
       assert(_.isFunction(bridge.removeListener), 'removeListener exists');
-      // not yet implemented
-      // assert(_.isFunction(bridge.once), 'once exists');
+      assert(
+        _.isFunction(bridge.removeAllListeners),
+        'removeAllListeners exists'
+      );
+      assert(_.isFunction(bridge.once), 'once exists');
 
       done();
     });
@@ -211,6 +214,7 @@ describe('events', function () {
         }
       });
     });
+
     it('should allow removing specific scoped events', function (done) {
       var count = 0;
       var channel1Count = 0;
