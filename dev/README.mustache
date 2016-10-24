@@ -173,11 +173,97 @@ The following operations are defined:
 {{{operations}}}
 ### Events
 
-Event listeners can be registered on the client as well as on resource instances. Note that resource instance listeners are tied to the instance while client listeners receive all events of a given type regardless of which resource the event is for.
+Event listeners can be registered on the client as well as on resource instances.
+
+#### Client Events
+
+Client events are received for all events of a given type regardless of which resource the event is for.
+
+```javascript
+ari.on('StasisStart', function (event, channelInstance) {
+    // will be called for all channels that enter the Stasis application
+});
+```
+
+#### Resource Instance Events
+
+Resource instance events are only received for the given type and resource.
+
+Callbacks:
+
+```javascript
+var channel = ari.Channel();
+channel.on('StasisStart', function (event, channelInstance) {
+    // will only be called when the channel above enters the Stasis application
+});
+
+channel.originate(
+  {endpoint: 'PJSIP/endpoint', app: 'applicationName'},
+  function (err, channelInstance) {}
+);
+```
+
+Promises:
+
+```javascript
+var channel = ari.Channel();
+channel.on('StasisStart', function (event, channelInstance) {
+    // will only be called when the channel above enters the Stasis application
+});
+
+channel.originate({endpoint: 'PJSIP/endpoint', app: 'applicationName'})
+  .then(function (channelInstance) {})
+  .catch(function (err) {});
+```
+
+#### Managing Events
+
+When using events, it is important to note that the callbacks you provide to handle events cannot be garbage collected until they are unregistered as shown below.
+
+At the client level:
+
+```javascript
+var handler = function (event, channel) {};
+
+// receive all 'ChannelDtmfReceived' events
+ari.on('ChannelDtmfReceived', handler);
+
+// at some point in your application, remove the event listener to ensure the handler function can be garbage collected
+ari.removeListener('ChannelDtmfReceived', handler);
+// or remove all event listeners for a particular event type
+ari.removeAllListeners('ChannelDtmfReceived');
+```
+
+At the instance level:
+
+```javascript
+var channel = ari.Channel();
+var handler = function (event, channel) {};
+
+// receive all 'ChannelDtmfReceived' events for this channel
+channel.on('ChannelDtmfReceived', handler);
+
+// at some point in your application, remove the event listener to ensure the handler function can be garbage collected
+channel.removeListener('ChannelDtmfReceived', handler);
+// or remove all event listeners for a particular event type
+channel.removeAllListeners('ChannelDtmfReceived');
+```
+
+For events that are only expected to fire once, `once` can be used to register an event listener that will automatically be unregistered once the event fires as shown below:
+
+```javascript
+var playback = ari.Playback();
+var handler = function (event, playback) {};
+
+// receive 'PlaybackFinished' events for this playback
+playback.once('PlaybackFinished', handler);
+```
+
+#### Supported Events
 
 The following events are defined:
 
-#### APILoadError
+##### APILoadError
 
 ARI client failed to load.
 
@@ -187,7 +273,7 @@ function (err) {}
 
 {{{events}}}
 
-#### WebSocketReconnecting
+##### WebSocketReconnecting
 
 WebSocket has disconnected, and the client is attempting to reconnect.
 
@@ -195,7 +281,7 @@ WebSocket has disconnected, and the client is attempting to reconnect.
 function (err) {}
 ```
 
-#### WebSocketConnected
+##### WebSocketConnected
 
 WebSocket has connected. Note that normally this event is emitted prior to resolving the `connect()` promise, so you probably will not get an even on the initial connection.
 
@@ -203,7 +289,7 @@ WebSocket has connected. Note that normally this event is emitted prior to resol
 function () {}
 ```
 
-#### WebSocketMaxRetries
+##### WebSocketMaxRetries
 
 Client will no longer attempt to reconnect to the WebSocket for the current application(s).
 
