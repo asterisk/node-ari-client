@@ -27,9 +27,9 @@
   "dependencies": {
     "backoff-func": "^0.1.2",
     "bluebird": "^2.9.34",
-    "node-uuid": "^1.4.1",
     "swagger-client": "2.0.26",
     "underscore": "^1.6.0",
+    "uuid": "^3.0.0",
     "ws": "^1.1.1"
   },
   "engines": {
