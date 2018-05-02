@@ -3199,14 +3199,6 @@ Client will no longer attempt to reconnect to the WebSocket for the current appl
 function (err) {}
 ```
 
-##### pong
-
-Client received pong event (to be used with the `ping()` method)
-
-```Javascript
-function () {}
-```
-
 # Examples
 
 Callbacks:
