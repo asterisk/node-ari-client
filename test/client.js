@@ -115,6 +115,7 @@ var operations = {
 describe('client', function () {
 
   var url = 'http://localhost:%s';
+  var unreachableUrl = 'http://notthere:8088';
   var user = 'user';
   var pass = 'secret';
   var ari = null;
@@ -146,6 +147,14 @@ describe('client', function () {
 
   it('should connect', function (done) {
     client.connect(url, user, pass, done);
+  });
+
+  it('should send an error if host is not reachable', function (done) {
+    client.connect(unreachableUrl, user, pass, function (err, newClient) {
+      if (err && err.name === 'HostIsNotReachable') {
+        done();
+      }
+    });
   });
 
   it('should auto-reconnect websocket', function (done) {
