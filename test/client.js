@@ -115,7 +115,11 @@ var operations = {
 describe('client', function () {
 
   var url = 'http://localhost:%s';
-  var unreachableUrl = 'http://notthere:8088';
+  var hostIsNotReachableUrls =
+      {
+        ENOTFOUND: 'http://notthere:8088',
+        ECONNREFUSED: 'http://localhost:65535'
+      };
   var user = 'user';
   var pass = 'secret';
   var ari = null;
@@ -149,10 +153,20 @@ describe('client', function () {
     client.connect(url, user, pass, done);
   });
 
-  it('should send an error if host is not reachable', function (done) {
-    client.connect(unreachableUrl, user, pass, function (err, newClient) {
+  it('should send an error on ENOTFOUND', function (done) {
+    client.connect(
+        hostIsNotReachableUrls.ENOTFOUND, user, pass, function (err) {
       if (err && err.name === 'HostIsNotReachable') {
         done();
+      }
+    });
+  });
+
+  it('should send an error on ECONNREFUSED', function (done) {
+    client.connect(
+        hostIsNotReachableUrls.ECONNREFUSED, user, pass, function (err) {
+      if (err && err.name === 'HostIsNotReachable') {
+          done();
       }
     });
   });
