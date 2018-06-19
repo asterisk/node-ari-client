@@ -155,18 +155,24 @@ describe('client', function () {
 
   it('should send an error on ENOTFOUND', function (done) {
     client.connect(
-        hostIsNotReachableUrls.ENOTFOUND, user, pass, function (err) {
+      hostIsNotReachableUrls.ENOTFOUND, user, pass, function (err) {
       if (err && err.name === 'HostIsNotReachable') {
         done();
+      } else {
+        assert.fail('Should not be able to connect to ' +
+          hostIsNotReachableUrls.ENOTFOUND);
       }
     });
   });
 
   it('should send an error on ECONNREFUSED', function (done) {
     client.connect(
-        hostIsNotReachableUrls.ECONNREFUSED, user, pass, function (err) {
+      hostIsNotReachableUrls.ECONNREFUSED, user, pass, function (err) {
       if (err && err.name === 'HostIsNotReachable') {
-          done();
+        done();
+      } else {
+        assert.fail('Should not be able to connect to ' +
+          hostIsNotReachableUrls.ECONNREFUSED);
       }
     });
   });
