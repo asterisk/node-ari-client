@@ -115,6 +115,11 @@ var operations = {
 describe('client', function () {
 
   var url = 'http://localhost:%s';
+  var hostIsNotReachableUrls =
+      {
+        ENOTFOUND: 'http://notthere:8088',
+        ECONNREFUSED: 'http://localhost:65535'
+      };
   var user = 'user';
   var pass = 'secret';
   var ari = null;
@@ -146,6 +151,30 @@ describe('client', function () {
 
   it('should connect', function (done) {
     client.connect(url, user, pass, done);
+  });
+
+  it('should send an error on ENOTFOUND', function (done) {
+    client.connect(
+      hostIsNotReachableUrls.ENOTFOUND, user, pass, function (err) {
+      if (err && err.name === 'HostIsNotReachable') {
+        done();
+      } else {
+        assert.fail('Should not be able to connect to ' +
+          hostIsNotReachableUrls.ENOTFOUND);
+      }
+    });
+  });
+
+  it('should send an error on ECONNREFUSED', function (done) {
+    client.connect(
+      hostIsNotReachableUrls.ECONNREFUSED, user, pass, function (err) {
+      if (err && err.name === 'HostIsNotReachable') {
+        done();
+      } else {
+        assert.fail('Should not be able to connect to ' +
+          hostIsNotReachableUrls.ECONNREFUSED);
+      }
+    });
   });
 
   it('should auto-reconnect websocket', function (done) {

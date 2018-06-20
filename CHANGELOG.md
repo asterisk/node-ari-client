@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.2.0 - 2017-06-15
+
+- ari client now returns an error when it is unable to connect
+
 ## 1.1.0 - 2016-10-21
 
 - Add parsing logic to handle 'binary' responseType from Asterisk.
