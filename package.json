@@ -27,6 +27,7 @@
   "dependencies": {
     "backoff-func": "^0.1.2",
     "bluebird": "^2.9.34",
+    "request": "^2.34.0",
     "swagger-client": "2.0.26",
     "underscore": "^1.6.0",
     "uuid": "^3.0.0",
@@ -47,7 +48,6 @@
     "mocha": "^3.0.2",
     "moment": "^2.6.0",
     "mustache": "^2.2.1",
-    "portfinder": "^1.0.6",
-    "request": "^2.34.0"
+    "portfinder": "^1.0.6"
   }
 }
