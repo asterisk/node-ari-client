@@ -26,18 +26,18 @@
   "author": "Samuel Fortier-Galarneau",
   "dependencies": {
     "backoff-func": "^0.1.2",
-    "bluebird": "^2.9.34",
+    "bluebird": "^3.5.2",
+    "lodash": "^4.17.10",
     "request": "^2.34.0",
     "swagger-client": "2.0.26",
-    "underscore": "^1.6.0",
     "uuid": "^3.0.0",
-    "ws": "^1.1.1"
+    "ws": "^6.0.0"
   },
   "engines": {
     "node": ">=8"
   },
   "devDependencies": {
-    "async": "^2.0.1",
+    "async": "^2.6.1",
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
     "grunt-jsdoc": "^2.1.0",
@@ -45,7 +45,7 @@
     "env-test": "^1.0.0",
     "istanbul": "^0.4.4",
     "jshint": "^2.9.2",
-    "mocha": "^3.0.2",
+    "mocha": "^5.2.0",
     "moment": "^2.6.0",
     "mustache": "^2.2.1",
     "portfinder": "^1.0.6"

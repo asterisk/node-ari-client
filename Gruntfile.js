@@ -66,7 +66,7 @@ module.exports = function(grunt) {
     var util = require('util');
     var fs = require('fs');
     var mustache = require('mustache');
-    var _ = require('underscore');
+    var _ = require('lodash');
     var resourcesLib = require('./lib/resources.js');
 
     var operations = '';
@@ -226,9 +226,9 @@ module.exports = function(grunt) {
             propType = util.format('%s', regexArr[1]);
           }
 
-          if (_.contains(resourcesLib.knownTypes, propType)) {
+          if (_.includes(resourcesLib.knownTypes, propType)) {
             promoted.push(prop.name);
-            if (!_.contains(instances, propType)) {
+            if (!_.includes(instances, propType)) {
               instances.push(propType);
             }
           }
