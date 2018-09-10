@@ -34,7 +34,7 @@
     "ws": "^1.1.1"
   },
   "engines": {
-    "node": ">=4"
+    "node": ">=8"
   },
   "devDependencies": {
     "async": "^2.0.1",
