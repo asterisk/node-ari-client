@@ -32,12 +32,14 @@ var operations = {
   ],
   bridges: [
     'list',
+    'clearVideoSource',
     'create',
     'createWithId',
     'get',
     'destroy',
     'addChannel',
     'removeChannel',
+    'setVideoSource',
     'startMoh',
     'stopMoh',
     'play',
@@ -751,14 +753,14 @@ describe('client', function () {
 
       server
         .post(
-          '/ari/channels?endpoint=SIP%2Fsoftphone&app=unittests',
+          '/ari/channels?endpoint=PJSIP%2Fsoftphone&app=unittests',
           body
         )
         .any()
         .reply(200, {id: '1'})
         .post(
           util.format(
-            '/ari/channels?endpoint=SIP%2Fsoftphone&app=unittests&channelId=%s',
+            '/ari/channels?endpoint=PJSIP%2Fsoftphone&app=unittests&channelId=%s',
             channel.id
           ),
           body
@@ -767,7 +769,7 @@ describe('client', function () {
         .reply(200, {id: '1'});
 
       var options = {
-        endpoint: 'SIP/softphone',
+        endpoint: 'PJSIP/softphone',
         app: 'unittests',
         variables: {'CALLERID(name)': 'Alice'}
       };
@@ -790,14 +792,14 @@ describe('client', function () {
 
       server
         .post(
-          '/ari/channels?endpoint=SIP%2Fsoftphone&app=unittests',
+          '/ari/channels?endpoint=PJSIP%2Fsoftphone&app=unittests',
           body
         )
         .any()
         .reply(200, {id: '1'})
         .post(
           util.format(
-            '/ari/channels?endpoint=SIP%2Fsoftphone&app=unittests&channelId=%s',
+            '/ari/channels?endpoint=PJSIP%2Fsoftphone&app=unittests&channelId=%s',
             channel.id
           ),
           body
@@ -806,7 +808,7 @@ describe('client', function () {
         .reply(200, {id: '1'});
 
       var options = {
-        endpoint: 'SIP/softphone',
+        endpoint: 'PJSIP/softphone',
         app: 'unittests',
         variables: {'CALLERID(name)': 'Bob'}
       };
@@ -828,14 +830,14 @@ describe('client', function () {
 
       server
         .post(
-          '/ari/channels?endpoint=SIP%2Fsoftphone&app=unittests',
+          '/ari/channels?endpoint=PJSIP%2Fsoftphone&app=unittests',
           body
         )
         .any()
         .reply(200, {id: '1'})
         .post(
           util.format(
-            '/ari/channels?endpoint=SIP%2Fsoftphone&app=unittests&channelId=%s',
+            '/ari/channels?endpoint=PJSIP%2Fsoftphone&app=unittests&channelId=%s',
             channel.id
           ),
           body
@@ -844,7 +846,7 @@ describe('client', function () {
         .reply(200, {id: '1'});
 
       var options = {
-        endpoint: 'SIP/softphone',
+        endpoint: 'PJSIP/softphone',
         app: 'unittests',
         variables: {'CUSTOM': 'myvar'}
       };
@@ -867,14 +869,14 @@ describe('client', function () {
 
       server
         .post(
-          '/ari/channels?endpoint=SIP%2Fsoftphone&app=unittests',
+          '/ari/channels?endpoint=PJSIP%2Fsoftphone&app=unittests',
           body
         )
         .any()
         .reply(200, {id: '1'})
         .post(
           util.format(
-            '/ari/channels?endpoint=SIP%2Fsoftphone&app=unittests&channelId=%s',
+            '/ari/channels?endpoint=PJSIP%2Fsoftphone&app=unittests&channelId=%s',
             channel.id
           ),
           body
@@ -883,7 +885,7 @@ describe('client', function () {
         .reply(200, {id: '1'});
 
       var options = {
-        endpoint: 'SIP/softphone',
+        endpoint: 'PJSIP/softphone',
         app: 'unittests',
         variables: {'CUSTOM': 'myothervar'}
       };
