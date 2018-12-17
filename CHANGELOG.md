@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.3.0 - 2018-12-17
+
+- updated generated files with Asterisk 15.6.0
+
+## 1.2.1 - 2018-07-05
+
+- moved the request lib to dependencies from dev-dependencies to fix issue
+introduced in 1.2.0
+
 ## 1.2.0 - 2017-06-15
 
 - ari client now returns an error when it is unable to connect
