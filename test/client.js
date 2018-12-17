@@ -11,7 +11,7 @@
 
 var util = require('util');
 var assert = require('assert');
-var _ = require('underscore');
+var _ = require('lodash');
 var Promise = require('bluebird');
 var http = require('http');
 var portfinder = require('portfinder');
@@ -279,7 +279,7 @@ describe('client', function () {
       'sounds'
     ];
     _.each(expected, function (resource) {
-      assert(_.contains(candidates, resource));
+      assert(_.includes(candidates, resource));
       assert(_.isObject(ari[resource]));
     });
 
@@ -295,7 +295,7 @@ describe('client', function () {
       'LiveRecording'
     ];
     _.each(expected, function (creator) {
-      assert(_.contains(candidates, creator));
+      assert(_.includes(candidates, creator));
       assert(_.isFunction(ari[creator]));
     });
 
@@ -309,7 +309,7 @@ describe('client', function () {
         var expected = value;
 
         _.each(expected, function (resource) {
-          assert(_.contains(candidates, resource));
+          assert(_.includes(candidates, resource));
           assert(_.isFunction(ari[key][resource]));
         });
 
@@ -347,7 +347,7 @@ describe('client', function () {
         assert.equal(instance.id, bridge.id);
 
         _.each(operations.bridges, function (operation) {
-          assert(_.contains(_.keys(bridge), operation));
+          assert(_.includes(_.keys(bridge), operation));
         });
       }
     });
@@ -386,7 +386,7 @@ describe('client', function () {
         assert.equal(instance.id, bridge.id);
 
         _.each(operations.bridges, function (operation) {
-          assert(_.contains(_.keys(bridge), operation));
+          assert(_.includes(_.keys(bridge), operation));
         });
       }
     });
@@ -547,7 +547,7 @@ describe('client', function () {
       var bridge = ari.Bridge();
 
       _.each(operations.bridges, function (operation) {
-        _.contains(_.keys(bridge), operation);
+        _.includes(_.keys(bridge), operation);
       });
 
       done();

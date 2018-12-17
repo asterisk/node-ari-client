@@ -11,7 +11,7 @@
 'use strict';
 
 var client = require('../lib/client.js');
-var _ = require('underscore');
+var _ = require('lodash');
 var util = require('util');
 var portfinder = require('portfinder');
 var http = require('http');
