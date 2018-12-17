@@ -14,7 +14,7 @@
   "quotmark": true,
   "camelcase": true,
   "strict": true,
-  "maxlen": 80,
+  "maxlen": 100,
   "globals": {
     "Promise" : true
   }

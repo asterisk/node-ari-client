@@ -18,7 +18,7 @@
 
 var client = require('ari-client');
 
-var ENDPOINT = 'SIP/sipphone';
+var ENDPOINT = 'PJSIP/sipphone';
 
 // replace ari.js with your Asterisk instance
 client.connect('http://ari.js:8088', 'user', 'secret',

@@ -94,7 +94,7 @@ Promises:
 
 ```javascript
 var bridge = ari.Bridge();
-bridge.create().
+bridge.create()
   .then(function (bridge) {})
   .catch(function (err) {});
 ```
@@ -110,7 +110,7 @@ var channel = ari.Channel();
 channel.on('StasisStart', function (event, channel) {});
 channel.on('ChannelDtmfReceived', function (event, channel) {});
 channel.originate(
-    {endpoint: 'SIP/1000', app: 'application', appArgs: 'dialed'},
+    {endpoint: 'PJSIP/1000', app: 'application', appArgs: 'dialed'},
     function (err, channel) {}
 );
 ```
@@ -121,7 +121,7 @@ Promises:
 var channel = ari.Channel();
 channel.on('StasisStart', function (event, channel) {});
 channel.on('ChannelDtmfReceived', function (event, channel) {});
-channel.originate({endpoint: 'SIP/1000', app: 'application', appArgs: 'dialed'})
+channel.originate({endpoint: 'PJSIP/1000', app: 'application', appArgs: 'dialed'})
   .then(function (channel) {})
   .catch(function (err) {});
 ```
@@ -680,6 +680,31 @@ ari.bridges.addChannel({
 - channel (string) - Ids of channels to add to bridge
 - role (string) - Channel's role in the bridge
 
+##### clearVideoSource
+
+Removes any explicit video source in a multi-party mixing bridge. This operation has no effect on bridges with two or fewer participants. When no explicit video source is set, talk detection will be used to determine the active video stream.
+
+Callbacks:
+
+```javascript
+ari.bridges.clearVideoSource(
+  {bridgeId: val},
+  function (err) {}
+);
+```
+
+Promises:
+
+```javascript
+ari.bridges.clearVideoSource({
+    bridgeId: val
+})
+  .then(function () {})
+  .catch(function (err) {});
+```
+###### Available Parameters
+- bridgeId (string) - Bridge's id
+
 ##### create
 
 Create a new bridge.
@@ -702,7 +727,7 @@ ari.bridges.create()
 ###### Available Parameters
 - bridgeId (string) - Unique ID to give to the bridge being created.
 - name (string) - Name to give to the bridge being created.
-- type (string) - Comma separated list of bridge type attributes (mixing, holding, dtmf_events, proxy_media).
+- type (string) - Comma separated list of bridge type attributes (mixing, holding, dtmf_events, proxy_media, video_sfu).
 
 ##### createWithId
 
@@ -729,7 +754,7 @@ ari.bridges.createWithId({
 ###### Available Parameters
 - bridgeId (string) - Unique ID to give to the bridge being created.
 - name (string) - Set the name of the bridge.
-- type (string) - Comma separated list of bridge type attributes (mixing, holding, dtmf_events, proxy_media) to set.
+- type (string) - Comma separated list of bridge type attributes (mixing, holding, dtmf_events, proxy_media, video_sfu) to set.
 
 ##### destroy
 
@@ -924,6 +949,33 @@ ari.bridges.removeChannel({
 - bridgeId (string) - Bridge's id
 - channel (string) - Ids of channels to remove from bridge
 
+##### setVideoSource
+
+Set a channel as the video source in a multi-party mixing bridge. This operation has no effect on bridges with two or fewer participants.
+
+Callbacks:
+
+```javascript
+ari.bridges.setVideoSource(
+  {bridgeId: val, channelId: val},
+  function (err) {}
+);
+```
+
+Promises:
+
+```javascript
+ari.bridges.setVideoSource({
+    bridgeId: val,
+    channelId: val
+})
+  .then(function () {})
+  .catch(function (err) {});
+```
+###### Available Parameters
+- bridgeId (string) - Bridge's id
+- channelId (string) - Channel's id
+
 ##### startMoh
 
 Play music on hold to a bridge or change the MOH class that is playing.
@@ -1059,6 +1111,7 @@ ari.channels.create({
 - appArgs (string) - The application arguments to pass to the Stasis application provided by 'app'. Mutually exclusive with 'context', 'extension', 'priority', and 'label'.
 - channelId (string) - The unique id to assign the channel on creation.
 - endpoint (string) - Endpoint for channel communication
+- formats (string) - The format name capability list to use if originator is not specified. Ex. "ulaw,slin16".  Format names can be found with "core show codecs".
 - originator (string) - Unique ID of the calling channel
 - otherChannelId (string) - The unique id to assign the second channel when using local channels.
 
@@ -1267,6 +1320,7 @@ ari.channels.originate({
 - context (string) - The context to dial after the endpoint answers. If omitted, uses 'default'. Mutually exclusive with 'app'.
 - endpoint (string) - Endpoint to call.
 - extension (string) - The extension to dial after the endpoint answers. Mutually exclusive with 'app'.
+- formats (string) - The format name capability list to use if originator is not specified. Ex. "ulaw,slin16".  Format names can be found with "core show codecs".
 - label (string) - The label to dial after the endpoint answers. Will supersede 'priority' if provided. Mutually exclusive with 'app'.
 - originator (string) - The unique id of the channel which is originating this one.
 - otherChannelId (string) - The unique id to assign the second channel when using local channels.
@@ -1305,6 +1359,7 @@ ari.channels.originateWithId({
 - context (string) - The context to dial after the endpoint answers. If omitted, uses 'default'. Mutually exclusive with 'app'.
 - endpoint (string) - Endpoint to call.
 - extension (string) - The extension to dial after the endpoint answers. Mutually exclusive with 'app'.
+- formats (string) - The format name capability list to use if originator is not specified. Ex. "ulaw,slin16".  Format names can be found with "core show codecs".
 - label (string) - The label to dial after the endpoint answers. Will supersede 'priority' if provided. Mutually exclusive with 'app'.
 - originator (string) - The unique id of the channel which is originating this one.
 - otherChannelId (string) - The unique id to assign the second channel when using local channels.
@@ -2708,6 +2763,20 @@ function (event, {bridge: val, bridge_from: val}) {}
 ###### Resource Specific Emitters
 Bridge
 
+##### BridgeVideoSourceChanged
+
+Notification that the source of video in a bridge has changed.
+
+```javascript
+function (event, bridge) {}
+```
+###### Available Event Properties
+- bridge (Bridge) - undefined
+- old_video_source_id (string) - undefined
+
+###### Resource Specific Emitters
+Bridge
+
 ##### ChannelCallerId
 
 Channel changed Caller ID.
@@ -3326,7 +3395,7 @@ client.connect('http://localhost:8088', 'user', 'secret')
 To run the mocha tests for ari-client, run the following:
 
 ```bash
-npm test
+$ npm test
 ```
 
 The tests run against a mocked ARI REST endpoint and websocket server.
@@ -3336,14 +3405,14 @@ The tests run against a mocked ARI REST endpoint and websocket server.
 After cloning the git repository, run the following to install all dev dependencies:
 
 ```bash
-npm install
-npm link
+$ npm install
+$ npm link
 ```
 
 Then run the following to run jshint and mocha tests:
 
 ```bash
-npm test
+$ npm test
 ```
 
 jshint will enforce a minimal style guide. It is also a good idea to create unit tests when adding new features to ari-client.
@@ -3351,7 +3420,7 @@ jshint will enforce a minimal style guide. It is also a good idea to create unit
 To generate a test coverage report run the following:
 
 ```bash
-npm run check-coverage
+$ npm run check-coverage
 ```
 
 This will also ensure a coverage threshold is met by the tests.
@@ -3359,7 +3428,7 @@ This will also ensure a coverage threshold is met by the tests.
 Unit test fixtures for ARI resources can be generated from a local asterisk instance by running the following:
 
 ```bash
-grunt genfixtures
+$ grunt genfixtures
 ```
 
 Once you have done this and loaded a mocked ARI server, individual calls can be mocked using the hock library. Websocket events can be mocked by creating a websocket server and calling its send method. The helpers module exposes methods for creating a mocked ARI server and a mocked websocket server for use in writing unit tests.
@@ -3367,7 +3436,7 @@ Once you have done this and loaded a mocked ARI server, individual calls can be 
 Developer documentation can ge generated by running the following:
 
 ```bash
-grunt jsdoc
+$ grunt jsdoc
 ```
 
 # License
