@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2.0.0 - 2018-12-17
+
+- now targeting Node 8
+
 ## 1.3.0 - 2018-12-17
 
 - updated generated files with Asterisk 15.6.0
