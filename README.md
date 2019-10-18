@@ -174,6 +174,32 @@ The following operations are defined:
 
 #### applications
 
+##### filter
+
+Filter application events types.
+
+Callbacks:
+
+```javascript
+ari.applications.filter(
+  {applicationName: val},
+  function (err, application) {}
+);
+```
+
+Promises:
+
+```javascript
+ari.applications.filter({
+    applicationName: val
+})
+  .then(function (application) {})
+  .catch(function (err) {});
+```
+###### Available Parameters
+- applicationName (string) - Application's name
+- filter (object) - Specify which event types to allow/disallow
+
 ##### get
 
 Get details of an application.
@@ -519,6 +545,25 @@ ari.asterisk.loadModule({
 ###### Available Parameters
 - moduleName (string) - Module's name
 
+##### ping
+
+Response pong message.
+
+Callbacks:
+
+```javascript
+ari.asterisk.ping(
+  function (err, asteriskping) {}
+);
+```
+
+Promises:
+
+```javascript
+ari.asterisk.ping()
+  .then(function (asteriskping) {})
+  .catch(function (err) {});
+```
 ##### reloadModule
 
 Reload an Asterisk module.
@@ -676,8 +721,10 @@ ari.bridges.addChannel({
   .catch(function (err) {});
 ```
 ###### Available Parameters
+- absorbDTMF (boolean) - Absorb DTMF coming from this channel, preventing it to pass through to the bridge
 - bridgeId (string) - Bridge's id
 - channel (string) - Ids of channels to add to bridge
+- mute (boolean) - Mute audio from this channel, preventing it to pass through to the bridge
 - role (string) - Channel's role in the bridge
 
 ##### clearVideoSource
@@ -1142,6 +1189,41 @@ ari.channels.dial({
 - channelId (string) - Channel's id
 - timeout (int) - Dial timeout
 
+##### externalMedia
+
+Start an External Media session.
+
+Callbacks:
+
+```javascript
+ari.channels.externalMedia(
+  {app: val, external_host: val, format: val},
+  function (err, channel) {}
+);
+```
+
+Promises:
+
+```javascript
+ari.channels.externalMedia({
+    app: val,
+    external_host: val,
+    format: val
+})
+  .then(function (channel) {})
+  .catch(function (err) {});
+```
+###### Available Parameters
+- app (string) - Stasis Application to place channel into
+- channelId (string) - The unique id to assign the channel on creation.
+- connection_type (string) - Connection type (client/server)
+- direction (string) - External media direction
+- encapsulation (string) - Payload encapsulation protocol
+- external_host (string) - Hostname/ip:port of external host
+- format (string) - Format to encode audio in
+- transport (string) - Transport protocol
+- variables (containers) - The "variables" key in the body object holds variable key/value pairs to set on the channel on creation. Other keys in the body object are interpreted as query parameters. Ex. { "endpoint": "SIP/Alice", "variables": { "CALLERID(name)": "Alice" } }
+
 ##### get
 
 Channel details.
@@ -1264,6 +1346,34 @@ ari.channels.list()
   .then(function (channels) {})
   .catch(function (err) {});
 ```
+##### move
+
+Move the channel from one Stasis application to another.
+
+Callbacks:
+
+```javascript
+ari.channels.move(
+  {app: val, channelId: val},
+  function (err) {}
+);
+```
+
+Promises:
+
+```javascript
+ari.channels.move({
+    app: val,
+    channelId: val
+})
+  .then(function () {})
+  .catch(function (err) {});
+```
+###### Available Parameters
+- app (string) - The channel will be passed to this Stasis application.
+- appArgs (string) - The application arguments to pass to the Stasis application provided by 'app'.
+- channelId (string) - Channel's id
+
 ##### mute
 
 Mute a channel.
@@ -1536,6 +1646,31 @@ ari.channels.ringStop({
     channelId: val
 })
   .then(function () {})
+  .catch(function (err) {});
+```
+###### Available Parameters
+- channelId (string) - Channel's id
+
+##### rtpstatistics
+
+RTP stats on a channel.
+
+Callbacks:
+
+```javascript
+ari.channels.rtpstatistics(
+  {channelId: val},
+  function (err, rtpstat) {}
+);
+```
+
+Promises:
+
+```javascript
+ari.channels.rtpstatistics({
+    channelId: val
+})
+  .then(function (rtpstat) {})
   .catch(function (err) {});
 ```
 ###### Available Parameters
@@ -2663,6 +2798,21 @@ ARI client failed to load.
 ```javascript
 function (err) {}
 ```
+
+##### ApplicationMoveFailed
+
+Notification that trying to move a channel to another Stasis application failed.
+
+```javascript
+function (event, channel) {}
+```
+###### Available Event Properties
+- args (List[string]) - Arguments to the application
+- channel (Channel) - undefined
+- destination (string) - undefined
+
+###### Resource Specific Emitters
+Channel
 
 ##### ApplicationReplaced
 
