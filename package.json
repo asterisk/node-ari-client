@@ -9,9 +9,8 @@
   ],
   "main": "./lib/client.js",
   "scripts": {
-    "test": "npm run lint && mocha",
-    "cover": "istanbul cover --report html _mocha",
-    "check-coverage": "npm run cover && istanbul check-coverage --lines 75 --statements 75 --functions 75 --branches 70",
+    "pretest": "npm run lint",
+    "test": "nyc mocha",
     "lint": "jshint . --verbose"
   },
   "repository": {
@@ -43,11 +42,11 @@
     "grunt-jsdoc": "^2.1.0",
     "hock": "^1.3.1",
     "env-test": "^1.0.0",
-    "istanbul": "^0.4.4",
     "jshint": "^2.9.2",
     "mocha": "^5.2.0",
     "moment": "^2.6.0",
     "mustache": "^2.2.1",
+    "nyc": "^15.0.0",
     "portfinder": "^1.0.6"
   }
 }
